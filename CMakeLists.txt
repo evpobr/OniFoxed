@@ -2,12 +2,18 @@ cmake_minimum_required(VERSION 3.16.0)
 
 project(OniAll LANGUAGES C)
 
+include(CheckIncludeFile)
 include(CMakeDependentOption)
 cmake_dependent_option(ONI_BINK_VIDEO "Build with Bink Video support" OFF "WIN32;CMAKE_SIZEOF_VOID_P EQUAL 4" OFF)
 
 # MSVC 19 finally
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
+
+check_include_file(stdbool.h HAVE_STDBOOL_H)
+if(HAVE_STDBOOL_H)
+	add_definitions(-DHAVE_STDBOOL_H)
+endif()
 
 include_directories(
 	BungieFrameWork/BFW_Headers/

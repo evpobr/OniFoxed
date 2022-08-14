@@ -14,6 +14,8 @@
 #ifndef BFW_H
 #define BFW_H
 
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h> /* XXX - Get rid of me */
 #include <string.h>
@@ -308,42 +310,31 @@ extern "C" {
 /*
  * ============================= Useful typedefs =============================
  */
- 
-	typedef unsigned long		UUtUns32;
-	typedef long				UUtInt32;
-	typedef unsigned short		UUtUns16;
-	typedef short				UUtInt16;
-	typedef unsigned char  		UUtUns8;
-	typedef signed char			UUtInt8;
 
+	typedef uint64_t			UUtUns64;
+	typedef int64_t				UUtInt64;
+	typedef uint32_t			UUtUns32;
+	typedef int32_t				UUtInt32;
+	typedef uint16_t			UUtUns16;
+	typedef int32_t				UUtInt16;
+	typedef uint8_t				UUtUns8;
+	typedef int32_t				UUtInt8;
+
+#if defined _MVC_VER || defined HAVE_STDBOOL_H
+	typedef bool				UUtBool;
+#else
 	typedef UUtUns8				UUtBool;
+#endif
 	typedef UUtUns16			UUtError;
 
-#if UUmCompiler == UUmCompiler_MWerks || UUmCompiler == UUmCompiler_MrC
-
-	typedef long long			UUtInt64;
-	typedef unsigned long long	UUtUns64;
-	
-	#define UUmFS_UUtUns64		"%llu"
-	#define UUmFS_UUtInt64		"%lld"
-
-#elif UUmCompiler == UUmCompiler_VisC
-
-	typedef LONGLONG			UUtInt64;
-	typedef ULONGLONG			UUtUns64;
-
-	#define UUmFS_UUtUns64		"%I64u"
-	#define UUmFS_UUtInt64		"%I64"
-        
-#elif UUmCompiler_GCC
-
-	typedef long long			UUtInt64;
-	typedef unsigned long long		UUtUns64;
-
-	#define UUmFS_UUtUns64		"%qu"
-	#define UUmFS_UUtInt64		"%qd"
-
-#endif
+	#define UUmFS_UUtUns64		PRIu64
+	#define UUmFS_UUtInt64		PRId64
+	#define UUmFS_UUtUns32		PRIu32
+	#define UUmFS_UUtInt32		PRId32
+	#define UUmFS_UUtUns16		PRIu16
+	#define UUmFS_UUtInt16		PRId16
+	#define UUmFS_UUtUns8		PRIu8
+	#define UUmFS_UUtInt8		PRId8
 
 	typedef tm_struct UUtRect
 	{

@@ -806,8 +806,8 @@ ASrPath_SetParams(
 	ioAstar->worldStart = *inStart;
 	ioAstar->worldEnd = *inEnd;
 
-	PHrWorldToGridSpace(&start.x, &start.y, inStart, inRoom);
-	PHrWorldToGridSpace(&end.x, &end.y, inEnd, inRoom);
+	PHrWorldToGridSpace((UUtUns16*) & start.x, (UUtUns16*) &start.y, inStart, inRoom);
+	PHrWorldToGridSpace((UUtUns16*) &end.x, (UUtUns16*) &end.y, inEnd, inRoom);
 
 	ioAstar->start.x = (UUtUns8) UUmPin(start.x, 0, PHcMaxGridSize - 1);
 	ioAstar->start.y = (UUtUns8) UUmPin(start.y, 0, PHcMaxGridSize - 1);
