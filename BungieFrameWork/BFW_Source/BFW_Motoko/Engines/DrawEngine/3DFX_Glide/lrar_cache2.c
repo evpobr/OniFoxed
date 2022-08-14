@@ -27,8 +27,6 @@ enum
 
 /* ---------- structures */
 
-typedef UUtBool boolean;
-
 struct lrar_cache_block
 {
 	void *user_data;
@@ -217,7 +215,7 @@ short lrar_allocate(
 	{
 		short oldest_block_index= cache->oldest_block_index;
 		
-		boolean done= UUcFalse;
+		UUtBool done= UUcFalse;
 
 		new_block_index= cache->last_allocated_block_index==NONE ? 0 : (cache->last_allocated_block_index+1);
 		if (new_block_index>=cache->block_count) new_block_index= 0;
@@ -406,7 +404,7 @@ static void verify_lrar_cache_block(
 	struct lrar_cache *cache,
 	struct lrar_cache_block *block)
 {
-	boolean valid= UUcFalse;
+	UUtBool valid= UUcFalse;
 
 	if ((block->signature==LRAR_CACHE_BLOCK_SIGNATURE) || (block->signature==LRAR_CACHE_DEALLOCATED_BLOCK_SIGNATURE))
 	{
@@ -428,7 +426,7 @@ static void verify_lrar_cache_block(
 void verify_lrar_cache(
 	struct lrar_cache *cache)
 {
-	boolean valid= UUcFalse;
+	UUtBool valid= UUcFalse;
 	
 	if (cache->signature==LRAR_CACHE_SIGNATURE &&
 		cache->minimum_address<cache->maximum_address &&
