@@ -14,7 +14,7 @@
 #ifndef BFW_H
 #define BFW_H
 
-#include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h> /* XXX - Get rid of me */
 #include <string.h>
@@ -321,23 +321,6 @@ extern "C" {
 
 	typedef UUtUns8				UUtBool;
 	typedef UUtUns16			UUtError;
-
-#if UUmCompiler == UUmCompiler_MWerks || UUmCompiler == UUmCompiler_MrC
-	
-	#define UUmFS_UUtUns64		"%llu"
-	#define UUmFS_UUtInt64		"%lld"
-
-#elif UUmCompiler == UUmCompiler_VisC
-
-	#define UUmFS_UUtUns64		"%I64u"
-	#define UUmFS_UUtInt64		"%I64"
-        
-#elif UUmCompiler_GCC
-
-	#define UUmFS_UUtUns64		"%qu"
-	#define UUmFS_UUtInt64		"%qd"
-
-#endif
 
 	typedef tm_struct UUtRect
 	{
