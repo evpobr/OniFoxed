@@ -2980,7 +2980,7 @@ static void OBJiDoor_DumpDebugInfo(OBJtObject *inDoor, BFtFile *inFile)
 
 	sprintf(msg, "door %d: class %s%s, position (%f %f %f) rotation %f",
 		door_osd->id, door_osd->door_class_name, (door_osd->door_class == NULL) ? " (not found)" : "",
-		inDoor->position.x, inDoor->position.y, inDoor->position.z, inDoor->rotation);
+		inDoor->position.x, inDoor->position.y, inDoor->position.z, inDoor->rotation.x);
 	OBJiDoor_DumpDebugLine(msg, inFile);
 
 	strcpy(msg, "  flags [");

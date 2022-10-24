@@ -2706,7 +2706,7 @@ OBJiENVFile_WriteNode_Geometry(
 			strcat(user_data, temp_buffer);
 			
 			// write the light intensity
-			sprintf(temp_buffer, "$intensity = %f"UUmNL, ls_data->light_intensity);
+			sprintf(temp_buffer, "$intensity = %" PRIu32 UUmNL, ls_data->light_intensity);
 			strcat(user_data, temp_buffer);
 			
 			// write the light beam angle

@@ -1748,8 +1748,8 @@ OSrSA_ListBrokenSounds(
 				sprintf(
 					text,
 					"%s\t%s\t%s",
-					OSgAnimTypeName[sound_array[j].anim_type],
-					OSgModTypeName[sound_array[j].mod_type],
+					OSgAnimTypeName[sound_array[j].anim_type].name,
+					OSgModTypeName[sound_array[j].mod_type].name,
 					sound_array[j].impulse_name);
 				COrConsole_Printf(text);
 				BFrFile_Printf(inFile, "%s"UUmNL, text);

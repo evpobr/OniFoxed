@@ -4944,7 +4944,7 @@ static void ONrGameState_DoCharacterDebugFrame(
 
 	sprintf(ONgChrStatus[6].text, "draw = %d death = %d air = %d off = %d", ONgNumCharactersDrawn, death_level,
 			(active_character == NULL) ? -1 : active_character->inAirControl.numFramesInAir, (active_character == NULL) ? -1 : active_character->offGroundFrames);
-	sprintf(ONgChrStatus[7].text, "%16x%16x [%04x]", keys_high, keys_low, (active_character == NULL) ? 0 : active_character->animVarient);
+	sprintf(ONgChrStatus[7].text, "%16" PRIx64 "%16" PRIx64 " [%04x]", keys_high, keys_low, (active_character == NULL) ? 0 : active_character->animVarient);
 	sprintf(ONgChrStatus[8].text, "alive %d active %d present %d in use %d", ONgGameState->numLivingCharacters, ONgGameState->numActiveCharacters, ONgGameState->numPresentCharacters, ONgGameState->numCharacters);
 
 	if (active_character != NULL) {

@@ -2656,7 +2656,7 @@ static UUtError OWiProp_Console_SaveOSD( WMtDialog *inDialog)
 	// get the id
 	window = WMrDialog_GetItemByID(inDialog, PCONcEF_ID);
 	WMrMessage_Send(window, EFcMessage_GetText, (UUtUns32)string, 6);
-	sscanf(string, "%d", &osd_all.osd.console_osd.id );	
+	sscanf(string, "%" SCNu16, &osd_all.osd.console_osd.id );	
 
 	// get the selected item text from the listbox
 	window = WMrDialog_GetItemByID(inDialog, PCONcLB_ConsoleTypes);
@@ -3116,7 +3116,7 @@ static UUtError OWiProp_Turret_SaveOSD( WMtDialog *inDialog)
 	// get the id
 	window = WMrDialog_GetItemByID(inDialog, PTUcEF_ID);
 	WMrMessage_Send(window, EFcMessage_GetText, (UUtUns32)string, OBJcMaxNoteChars);
-	sscanf(string, "%d", &osd_all.osd.turret_osd.id );	
+	sscanf(string, "%" SCNu16, &osd_all.osd.turret_osd.id );	
 	
 	// get the initial active state
 	window = WMrDialog_GetItemByID(inDialog, PTUcCB_InitialActive);
