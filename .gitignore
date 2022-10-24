@@ -16,9 +16,7 @@
 
 #############################################
 # Project Directories
-/build/vs2019_x86/
-/build/vs2022_x86/
-/cmake-build-debug/
+/*[Bb]uild*/
 
 #############################################
 # Misc IDE Directories
