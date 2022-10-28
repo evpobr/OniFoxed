@@ -510,6 +510,8 @@ if(WIN32)
             ../../OniResources/resource.h)
 	target_link_libraries(Oni
 		PRIVATE
+			SDL2::SDL2
+                        OpenGL::GL
 			winmm
 			msacm32
 			ws2_32

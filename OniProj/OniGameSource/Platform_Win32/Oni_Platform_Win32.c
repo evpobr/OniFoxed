@@ -20,6 +20,8 @@
 
 #include <windows.h>
 
+#include <SDL_syswm.h>
+
 #include "BFW_Motoko.h"
 #include "BFW_LocalInput.h"
 #include "BFW_AppUtilities.h"
@@ -59,41 +61,9 @@ FILE*		ONgErrorFile = NULL;
 UUtBool		ONgShiftDown = UUcFalse;
 
 // ======================================================================
-// prototypes
-// ======================================================================
-void UUcExternal_Call main(int argc, char *argv[]);
-
-// ======================================================================
 // functions
 // ======================================================================
 // ----------------------------------------------------------------------
-static void
-ONiHandleMouseEvent(
-	UINT	iMsg,
-	WPARAM	wParam,
-	LPARAM	lParam)
-{
-	LItInputEventType		event_type;
-	IMtPoint2D				mouse_pos;
-	
-	switch (iMsg)
-	{
-		case WM_MOUSEMOVE:		event_type = LIcInputEvent_MouseMove;		break;
-		case WM_LBUTTONDOWN:	event_type = LIcInputEvent_LMouseDown;		break;
-		case WM_LBUTTONDBLCLK:	event_type = LIcInputEvent_LMouseDown;		break;
-		case WM_LBUTTONUP:		event_type = LIcInputEvent_LMouseUp;		break;
-		case WM_RBUTTONDOWN:	event_type = LIcInputEvent_RMouseDown;		break;
-		case WM_RBUTTONDBLCLK:	event_type = LIcInputEvent_RMouseDown;		break;
-		case WM_RBUTTONUP:		event_type = LIcInputEvent_RMouseUp;		break;
-		case WM_MBUTTONDOWN:	event_type = LIcInputEvent_MMouseDown;		break;
-		case WM_MBUTTONDBLCLK:	event_type = LIcInputEvent_MMouseDown;		break;
-		case WM_MBUTTONUP:		event_type = LIcInputEvent_MMouseUp;		break;
-	}
-	
-	mouse_pos.x = LOWORD(lParam);
-	mouse_pos.y = HIWORD(lParam);
-	LIrInputEvent_Add(event_type, &mouse_pos, 0, wParam);
-}	
 
 // ----------------------------------------------------------------------
 static LRESULT CALLBACK ONiPlatform_WindowProc(
@@ -196,7 +166,7 @@ static LRESULT CALLBACK ONiPlatform_WindowProc(
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONDBLCLK:
 		case WM_MBUTTONUP:
-			ONiHandleMouseEvent(iMsg, wParam, lParam);
+			// ONiHandleMouseEvent(iMsg, wParam, lParam);
 		return 0;
 				
 		case WM_ACTIVATE:
@@ -263,86 +233,25 @@ static void
 ONiPlatform_CreateWindow(
 	ONtPlatformData		*ioPlatformData)
 {
-	WNDCLASSEX	windClass;
-	ATOM		atom;
-	UUtUns16	screen_width;
-	UUtUns16	screen_height;
-
-	if (FindWindow(ONcMainWindowClass, ONcMainWindowTitle) != NULL)
-	{
-		AUrMessageBox(AUcMBType_OK, "There is already an instance of the game running.");
-		exit(0);
-	}
-	
-	windClass.cbSize = sizeof(windClass);
-	windClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	windClass.lpfnWndProc = ONiPlatform_WindowProc;
-	windClass.cbClsExtra = 0;
-	windClass.cbWndExtra = 0;
-	windClass.hInstance = ioPlatformData->appInstance;
-	windClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	windClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windClass.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH/*WHITE_BRUSH*/);
-	windClass.lpszMenuName = NULL;
-	windClass.lpszClassName = ONcMainWindowClass;
-	windClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
-	atom = RegisterClassEx(&windClass);
-
 	// get the width and height of the screen
-	screen_width = GetSystemMetrics(SM_CXSCREEN);
-	screen_height = GetSystemMetrics(SM_CYSCREEN);
+	int screen_width = GetSystemMetrics(SM_CXSCREEN);
+	int screen_height = GetSystemMetrics(SM_CYSCREEN);
 
-	if (0 != atom)
-	{
-		ioPlatformData->gameWindow =
-			CreateWindowEx(
-				WS_EX_LEFT,
-				ONcMainWindowClass,
-				ONcMainWindowTitle,
-				WS_POPUP,
-				ONcSurface_Left,
-				ONcSurface_Top,
-				screen_width,
-				screen_height,
-				NULL,
-				NULL,
-				ioPlatformData->appInstance,
-				NULL);
+	ioPlatformData->sdlWindow = SDL_CreateWindow(
+		ONcMainWindowTitle,
+		ONcSurface_Left,
+		ONcSurface_Top,
+		screen_width,
+		screen_height,
+		SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+	
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(ioPlatformData->sdlWindow, &wmInfo);
+	ioPlatformData->gameWindow = wmInfo.info.win.window;
 
-		ShowWindow(ioPlatformData->gameWindow, 1);
-		UpdateWindow(ioPlatformData->gameWindow);
+	UUmAssert(fullscreenCandidate(ioPlatformData->gameWindow));
 
-		UUmAssert(fullscreenCandidate(ioPlatformData->gameWindow));
-
-		//	UpdateWindow(ioPlatformData->gameWindow);
-		
-		#if 0 //defined(DEBUG_AKIRA) && DEBUG_AKIRA
-
-			ioPlatformData->akiraWindow =
-				CreateWindowEx(
-					WS_EX_LEFT,
-					ONcMainWindowClass,
-					ONcMainWindowTitle,
-					WS_POPUP,
-					ONcSurface_Width,
-					0,
-					512,
-					512,
-					NULL,
-					NULL,
-					ioPlatformData->appInstance,
-					NULL);
-		
-			ShowWindow(ioPlatformData->akiraWindow, 1);
-		
-		#endif
-
-	}
-	else
-	{
-		// error here
-	}
 }
 
 
@@ -350,6 +259,8 @@ ONiPlatform_CreateWindow(
 UUtError ONrPlatform_Initialize(
 	ONtPlatformData			*outPlatformData)
 {
+	SDL_Init(SDL_INIT_EVENTS);
+
 	HRESULT			ddReturn = DD_OK;
 	
 	outPlatformData->appInstance = ONgAppHInstance;
@@ -377,6 +288,11 @@ void ONrPlatform_Terminate(
 	{
 		fclose(ONgErrorFile);
 	}
+	
+	SDL_DestroyWindow(ONgPlatformData.sdlWindow);
+	ONgPlatformData.sdlWindow = NULL;
+	
+	SDL_Quit();
 }
 
 // ----------------------------------------------------------------------

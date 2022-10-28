@@ -64,7 +64,6 @@ static void gl_setup_nv_combiners_for_env_maps(void);
 static void gl_setup_texture_env_combine_for_env_maps(void);
 
 static boolean gl_load_library(void);
-static boolean gl_library_is_loaded(void);
 
 static UUtError gl_fog_start_changeto_func(SLtErrorContext *inErrorContext, UUtUns32 inParameterListLength,
 										SLtParameter_Actual *inParameterList, UUtUns32 *outTicksTillCompletion,
@@ -121,10 +120,6 @@ boolean opengl_available(
 
 			success= gl_load_library();
 		}
-	}
-	else
-	{
-		success= gl_library_is_loaded();
 	}
 
 	return success;
@@ -377,16 +372,11 @@ static void *load_gl_extension_routine(
 	void *extension_routine= NULL;
 
 	UUmAssert(extension_name);
-
-#if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
-	extension_routine= WGL_FXN(wglGetProcAddress)(extension_name);
-#elif defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Mac)
-	extension_routine = AGL_FXN(aglGetProcAddress)(extension_name);
-#else
-	#error "unknown platform"
-#endif
 	
-	UUmAssert(gl_GetError() == GL_NO_ERROR);
+	if (SDL_GL_ExtensionSupported(extension_name))
+	{
+		extension_routine= SDL_GL_GetProcAddress(extension_name);
+	}
 	
 	return extension_routine;
 }
@@ -1943,25 +1933,19 @@ void gl_sync_to_vtrace(
 	boolean enable)
 {
 
-#if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
 	if (enable && !gl->gl_vsync_enabled)
 	{
-		if (!GL_EXT(wglSwapIntervalEXT))
+		int ret = SDL_GL_SetSwapInterval(enable ? 1 : 0);
+		gl->gl_vsync_enabled= ret == 0 ? TRUE : FALSE;
+		if (ret == -1)
 		{
-			GL_EXT(wglSwapIntervalEXT)= load_gl_extension_routine("wglSwapIntervalEXT");
+			UUrStartupMessage("SDL_GL_SetSwapInterval() unsupported; vsync= %d", gl->gl_vsync_enabled);
 		}
-
-		if (GL_EXT(wglSwapIntervalEXT))
+		else
 		{
-			gl->gl_vsync_enabled= GL_EXT(wglSwapIntervalEXT)(1);
-			UUrStartupMessage("wglSwapIntervalEXT supported; vsync= %d", gl->gl_vsync_enabled);
+			UUrStartupMessage("SDL_GL_SetSwapInterval() supported; vsync= %d", gl->gl_vsync_enabled);
 		}
 	}
-#endif
-	
-	UUmAssert(gl_GetError() == GL_NO_ERROR);
-
-	return;
 }
 
 static void gl_setup_multitexturing(
@@ -2125,53 +2109,7 @@ GLenum gl_GetError(
 static boolean gl_load_library(
 	void)
 {
-	boolean success= TRUE;
-
-#ifdef GL_LOAD_API_DYNAMICALLY
-	memset(gl_api, 0, sizeof(struct gl_api));
-	#if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
-	success= gl_load_opengl_dll();
-	#endif
-		
-	/*
-		this marks the end of standard API functions that are required to run
-		optional extensions are loaded as needed
-	*/
-	gl_api->end_standard_api= (void *)NONE;
-
-	if (success)
-	{
-		success= gl_library_is_loaded();
-	}
-#endif // GL_LOAD_API_DYNAMICALLY
-
-	return success;
-}
-
-static boolean gl_library_is_loaded(
-	void)
-{
-	boolean loaded= TRUE;
-#ifdef GL_LOAD_API_DYNAMICALLY
-	int i, n;
-
-	n= sizeof(struct gl_api)/sizeof(void *);
-	for (i=0; i<n; i++)
-	{
-		void **api_ptr= (void **)gl_api;
-
-		if (api_ptr[i] == (void *)NONE) // gl_api->end_standard_api
-		{
-			break;
-		}
-		if (api_ptr[i] == NULL)
-		{
-			loaded= FALSE;
-			break;
-		}
-	}
-#endif
-	return loaded;
+	return TRUE;
 }
 
 float gl_calculate_fog_factor(

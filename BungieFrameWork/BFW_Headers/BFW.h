@@ -22,6 +22,8 @@
 #include <float.h>
 #include <limits.h>
 
+#include <SDL.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

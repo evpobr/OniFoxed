@@ -37,6 +37,9 @@ typedef struct ONtPlatformData
 	UUtAppInstance 	appInstance;
 	UUtWindow		gameWindow;
 	
+	SDL_Window*		sdlWindow;
+	SDL_Renderer*	sdlRenderer;
+	
 	#if defined(DEBUGGING) && DEBUGGING
 		
 		UUtWindow	akiraWindow;
