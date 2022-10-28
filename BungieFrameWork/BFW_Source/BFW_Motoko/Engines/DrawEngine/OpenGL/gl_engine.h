@@ -680,15 +680,8 @@ struct gl_state_global {
 	TMtPrivateData *texture_private_data;
 	void *converted_data_buffer;
 
-	// platform-specific parameters
-#if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
-	HGLRC render_context;
+	SDL_GLContext context;
 	boolean gl_vsync_enabled;
-#elif defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Mac)
-	void *context; // AGLContext
-#else
-	#error "unknown platform!"
-#endif
 
 #ifdef GL_ENABLE_ALPHA_FADE_CODE
 	boolean blend_to_frame_buffer_with_constant_alpha;
