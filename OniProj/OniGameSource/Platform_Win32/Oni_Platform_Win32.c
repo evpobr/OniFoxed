@@ -20,8 +20,6 @@
 
 #include <windows.h>
 
-#include <SDL_syswm.h>
-
 #include "BFW_Motoko.h"
 #include "BFW_LocalInput.h"
 #include "BFW_AppUtilities.h"
@@ -37,7 +35,6 @@
 // defines
 // ======================================================================
 #define ONcMainWindowClass	TEXT("ONI ")
-#define ONcMainWindowTitle	TEXT("ONI ")
 
 #define	ONcSurface_Width	MScScreenWidth
 #define ONcSurface_Height	MScScreenHeight
@@ -233,25 +230,7 @@ static void
 ONiPlatform_CreateWindow(
 	ONtPlatformData		*ioPlatformData)
 {
-	// get the width and height of the screen
-	int screen_width = GetSystemMetrics(SM_CXSCREEN);
-	int screen_height = GetSystemMetrics(SM_CYSCREEN);
-
-	ioPlatformData->sdlWindow = SDL_CreateWindow(
-		ONcMainWindowTitle,
-		ONcSurface_Left,
-		ONcSurface_Top,
-		screen_width,
-		screen_height,
-		SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
-	
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(ioPlatformData->sdlWindow, &wmInfo);
-	ioPlatformData->gameWindow = wmInfo.info.win.window;
-
-	UUmAssert(fullscreenCandidate(ioPlatformData->gameWindow));
-
+	return;
 }
 
 

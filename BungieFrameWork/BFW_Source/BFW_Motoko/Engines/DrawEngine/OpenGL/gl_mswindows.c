@@ -13,6 +13,9 @@
 #include "Oni_Persistance.h"
 
 #include "SDL2/SDL_pixels.h"
+#include <SDL_syswm.h>
+
+#define ONcMainWindowTitle	TEXT("ONI ")
 
 void M3rSetGamma(
 	float inGamma)
@@ -24,166 +27,9 @@ void M3rSetGamma(
 	return;
 }
 
-static boolean set_display_settings(
-	int width,
-	int height,
-	int depth)
-{
-	UUtBool success= UUcFalse;
-	SDL_DisplayMode desired_display_mode, current_display_mode;
-
-	//FIXME: assumed
-	UUmAssert(depth == 16 || depth == 32);
-	success= SDL_GetWindowDisplayMode(ONgPlatformData.sdlWindow, &current_display_mode) == 0;
-	UUmAssert(success);
-
-	// if Motoko asks for a bit depth other than what the PC is currently set to,
-	// ALOT of PC video cards punt. So, we have to catch that here.
-	if (success && (SDL_BITSPERPIXEL(current_display_mode.format) < depth))
-	{
-		depth= gl->display_mode.bitDepth= (short)SDL_BITSPERPIXEL(current_display_mode.format);
-	}
-
-	desired_display_mode.format = depth == 16 ? SDL_PIXELFORMAT_RGB565 : SDL_PIXELFORMAT_RGB888;
-	desired_display_mode.w= width;
-	desired_display_mode.h= height;
-	desired_display_mode.refresh_rate= 0;
-	desired_display_mode.driverdata= 0;
-	
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); //FIXME
-	SDL_SetWindowSize(ONgPlatformData.sdlWindow, width, height);
-	success = UUcTrue;
-	
-	if(success)
-	{
-		Uint32 fullscreenFlags;
-		if (M3gResolutionSwitch)
-		{
-			fullscreenFlags = SDL_WINDOW_FULLSCREEN;
-		}
-		else
-		{
-			fullscreenFlags = 0;
-		}
-
-		success = SDL_SetWindowFullscreen(ONgPlatformData.sdlWindow, fullscreenFlags) == 0;
-	}
-
-	return success;
-}
-
-/*
-void make_pixel_format_descriptor(
-	PIXELFORMATDESCRIPTOR *pfd,
-	word bit_depth)
-{
-	UUmAssert(pfd);
-	memset(pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-
-	pfd->nSize= sizeof(PIXELFORMATDESCRIPTOR);
-	pfd->nVersion= 1;
-	pfd->dwFlags= PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-
-	pfd->iPixelType= PFD_TYPE_RGBA;
-
-	pfd->dwLayerMask= PFD_MAIN_PLANE;
-
-	switch (bit_depth)
-	{
-		case 16:
-			pfd->cColorBits= 16; 
-			pfd->cDepthBits= 16;
-			break;
-		case 32:
-			pfd->cColorBits= 24;
-			pfd->cDepthBits= 32;
-			break;
-		default:
-			pfd->cColorBits= 16;
-			pfd->cDepthBits= 16;
-			break;
-	}
-
-	return;
-}
-
-boolean gl_pixel_format_is_accelerated(
-	PIXELFORMATDESCRIPTOR *pfd)
-{
-	boolean accelerated= TRUE;
-	int generic_format, generic_accelerated;
-
-	UUmAssert(pfd);
-
-	generic_format= pfd->dwFlags & PFD_GENERIC_FORMAT;
-	generic_accelerated= pfd->dwFlags & PFD_GENERIC_ACCELERATED;
-
-	if (generic_format && ! generic_accelerated)
-	{
-		// software
-		accelerated= FALSE;
-	}
-	else if (generic_format && generic_accelerated)
-	{
-		// hardware - MCD
-	}
-	else if (!generic_format && !generic_accelerated)
-	{
-		// hardware - ICD
-	}
-	else
-	{
-		accelerated= FALSE; // ?
-	}
-
-	return accelerated;
-}
-*/
-
-boolean gl_create_render_context(
+static boolean gl_create_render_context(
 	void)
 {
-	/*
-	boolean success= FALSE;
-	
-				success= gl_pixel_format_is_accelerated(&pfd);
-				if (success)
-				{
-					UUrStartupMessage("opengl color bits = %d", pfd.cColorBits);
-					UUrStartupMessage("opengl depth bits = %d", pfd.cDepthBits);
-					if (!gl->render_context)
-					{
-						gl->render_context= WGL_FXN(wglCreateContext)(gl->device_context);
-						if (!gl->render_context)
-						{
-							DWORD hr;
-							char string[256]= "";
-
-							hr= FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-								MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-								string, 256, NULL);
-							UUrDebuggerMessage("wglCreateContext() failed : %s", string);
-						}
-					}
-					success= ((gl->render_context != NULL) &&
-						WGL_FXN(wglMakeCurrent)(gl->device_context, gl->render_context));
-				}
-			}
-			else
-			{
-				DWORD hr;
-				char string[256]= "";
-
-				hr= FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-					string, 256, NULL);
-				UUrDebuggerMessage("SetPixelFormat() failed : %s", string);
-			}
-		}
-	}
-
-	return success;
-*/
 	UUtBool success;
 	if (!gl->context)
 	{
@@ -210,61 +56,41 @@ UUtBool gl_platform_initialize(
 	int width= gl->display_mode.width;
 	int height= gl->display_mode.height;
 	int depth= gl->display_mode.bitDepth;
-
-	if ((width != current_width) || (height != current_height) || (depth != current_depth))
+	
+	if (ONgPlatformData.sdlWindow)
 	{
-	#ifdef DESTROY_CONTEXTS_ON_DISPLAY_CHANGE // textures get mangled, but doesn't crash the game
-		// tear down current contexts & rebuild everything
-		success= SDL_GL_MakeCurrent(NULL, NULL) == 0;
-		if (!success)
-		{
-			UUrDebuggerMessage("SDL_GL_MakeCurrent() failed : %s", SDL_GetError());
-		}
-		UUmAssert(gl->context);
-		SDL_GL_DeleteContext(gl->context) == 0;
-		gl->context= NULL;
-	#endif
-	}
-
-	if ((width != current_width) || (height != current_height) || (depth != current_depth))
-	{
-		success= set_display_settings(width, height, depth);
-	}
-
-	if (success == FALSE)
-	{
-		if (gl->display_mode.bitDepth != 16 || (width != 640) || (height != 480))
-		{
-			width= 640;
-			height= 480;
-			depth= 16;
-			success= set_display_settings(width, height, depth);
-			if (success)
+		
+		SDL_DisplayMode mode =
 			{
-				// sure the higher level code thinks the bit depth is different, but who cares? not me!
-				gl->display_mode.bitDepth= depth;
-			}
-		}
+    			.format = depth == 32 ? SDL_PIXELFORMAT_RGB888 : SDL_PIXELFORMAT_RGB565,
+    			.w = width,
+    			.h = height
+			};
+		success = SDL_SetWindowDisplayMode(ONgPlatformData.sdlWindow, &mode) == 0;
+	}
+	else
+	{
+		ONgPlatformData.sdlWindow = SDL_CreateWindow(
+			ONcMainWindowTitle,
+			0,
+			0,
+			width,
+			height,
+			SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+	
+			SDL_SysWMinfo wmInfo;
+			SDL_VERSION(&wmInfo.version);
+			SDL_GetWindowWMInfo(ONgPlatformData.sdlWindow, &wmInfo);
+			ONgPlatformData.gameWindow = wmInfo.info.win.window;
+		
+		success = ONgPlatformData.sdlWindow != NULL;
 	}
 
 	if (success)
 	{
 		M3rSetGamma(ONrPersist_GetGamma());
 
-			success= gl_create_render_context();
-			if (!success)
-			{
-				if (depth != 16)
-				{
-					// try again at 16-bit
-					success= set_display_settings(width, height, 16);
-					if (success)
-					{
-						gl->display_mode.bitDepth= depth= 16;
-						success= gl_create_render_context();
-					}
-				}
-			}
+		success= gl_create_render_context();
 	}
 	if (!success) // the app doesn't handle failure so we do it here
 	{
@@ -284,7 +110,6 @@ UUtBool gl_platform_initialize(
 void gl_platform_dispose(
 	void)
 {
-	int screen_width, screen_height;
 	UUtBool success;
 
 	success= SDL_GL_MakeCurrent(NULL, NULL) == 0;
@@ -337,14 +162,9 @@ int gl_enumerate_valid_display_modes(
 			/*{1920, 1200, 32, 0}*/};
 	int n= sizeof(desired_display_mode_list)/sizeof(desired_display_mode_list[0]);
 	int i, num_valid_display_modes= 0;
-	//SDL_DisplayMode mode;
-	//int modes= SDL_GetNumDisplayModes();
-	//SDL_GetDisplayMode(0, n, &mode);
 
 	for (i=0; i<n && i<M3cMaxDisplayModes; i++)
 	{
-		SDL_DisplayMode desired_display_mode;
-
 		//TODO: filter available modes
 		display_mode_list[num_valid_display_modes]= desired_display_mode_list[i];
 		++num_valid_display_modes;
