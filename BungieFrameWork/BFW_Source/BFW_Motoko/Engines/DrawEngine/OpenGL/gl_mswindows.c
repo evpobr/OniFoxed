@@ -13,9 +13,6 @@
 #include "Oni_Persistance.h"
 
 #include "SDL2/SDL_pixels.h"
-#include <SDL_syswm.h>
-
-#define ONcMainWindowTitle	TEXT("ONI ")
 
 void M3rSetGamma(
 	float inGamma)
@@ -56,35 +53,16 @@ UUtBool gl_platform_initialize(
 	int width= gl->display_mode.width;
 	int height= gl->display_mode.height;
 	int depth= gl->display_mode.bitDepth;
-	
-	if (ONgPlatformData.sdlWindow)
-	{
-		
-		SDL_DisplayMode mode =
-			{
-    			.format = depth == 32 ? SDL_PIXELFORMAT_RGB888 : SDL_PIXELFORMAT_RGB565,
-    			.w = width,
-    			.h = height
-			};
-		success = SDL_SetWindowDisplayMode(ONgPlatformData.sdlWindow, &mode) == 0;
-	}
-	else
-	{
-		ONgPlatformData.sdlWindow = SDL_CreateWindow(
-			ONcMainWindowTitle,
-			0,
-			0,
-			width,
-			height,
-			SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
-	
-			SDL_SysWMinfo wmInfo;
-			SDL_VERSION(&wmInfo.version);
-			SDL_GetWindowWMInfo(ONgPlatformData.sdlWindow, &wmInfo);
-			ONgPlatformData.gameWindow = wmInfo.info.win.window;
-		
-		success = ONgPlatformData.sdlWindow != NULL;
-	}
+
+	UUmAssert(ONgPlatformData.sdlWindow != NULL);
+
+	SDL_DisplayMode mode =
+		{
+			.format = depth == 32 ? SDL_PIXELFORMAT_RGB888 : SDL_PIXELFORMAT_RGB565,
+			.w = width,
+			.h = height
+		};
+	success = SDL_SetWindowDisplayMode(ONgPlatformData.sdlWindow, &mode) == 0;
 
 	if (success)
 	{
