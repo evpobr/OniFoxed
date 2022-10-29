@@ -68,7 +68,7 @@ float AI2rExecutor_GetMaxDeltaFacingPerFrame(ONtCharacterClass *inClass, AI2tMov
 void AI2rExecutor_Update(ONtCharacter *ioCharacter)
 {
 	ONtInputState input;
-	AI2tMovementMode current_movement_mode;
+	AI2tMovementMode current_movement_mode = AI2cMovementMode_Default;
 	LItButtonBits keys;
 	UUtBool disable_turn = UUcFalse;
 	float facing_goal, delta_facing_goal, new_facing;

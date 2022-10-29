@@ -6451,6 +6451,8 @@ static UUtBool AI2iMelee_Position_Update(ONtCharacter *ioCharacter, AI2tMeleeSta
 	AI2tMeleeMoveState orig_state;
 #endif
 
+	delay_transition = UUcFalse;
+
 	UUmAssertReadPtr(active_character, sizeof(*active_character));
 	UUmAssert((inMove->move & AI2cMoveType_Mask) == AI2cMoveType_Position);
 
@@ -8128,4 +8130,3 @@ static UUtBool AI2iMelee_Throw_CanEvade(ONtCharacter *ioCharacter, AI2tMeleeStat
 	// the throw is instantaneous, no opportunity to evade
 	return UUcFalse;
 }
-
