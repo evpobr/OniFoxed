@@ -96,7 +96,7 @@ ONiPlatform_CreateWindow(
 UUtError ONrPlatform_Initialize(
 	ONtPlatformData			*outPlatformData)
 {
-	SDL_Init(SDL_INIT_EVENTS);
+	SDL_Init(SDL_INIT_EVERYTHING);
 
 	outPlatformData->appInstance = ONgAppHInstance;
 	
