@@ -261,8 +261,6 @@ UUtError ONrPlatform_Initialize(
 {
 	SDL_Init(SDL_INIT_EVENTS);
 
-	HRESULT			ddReturn = DD_OK;
-	
 	outPlatformData->appInstance = ONgAppHInstance;
 	
 	ONiPlatform_CreateWindow(outPlatformData);
