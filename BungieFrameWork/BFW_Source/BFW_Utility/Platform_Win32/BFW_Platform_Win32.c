@@ -656,42 +656,12 @@ void UUrPlatform_Idle(UUtWindow mainWindow, UUtUns32 inIdleTime)
 
 UUtInt64 UUrMachineTime_High(void)
 {
-	LARGE_INTEGER time;
-	BOOL success;
-	UUtInt64 result;
-
-	success = QueryPerformanceCounter(&time);
-	
-	if (success)
-	{
-		result = time.QuadPart;
-	}
-	else 
-	{
-		result = GetTickCount();
-	}
-
-	return time.QuadPart;
+	return SDL_GetPerformanceCounter();
 }
 
 double UUrMachineTime_High_Frequency(void)
 {
-	LARGE_INTEGER frequency;
-	BOOL success;
-	double result;
-
-	success = QueryPerformanceFrequency(&frequency);
-
-	if (success)
-	{
-		result = (double)frequency.QuadPart;
-	}
-	else
-	{
-		result = 1000.0;	// resolution of GetTickCount
-	}
-
-	return result;
+	return SDL_GetPerformanceFrequency();
 }
 
 UUtUns32
