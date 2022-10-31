@@ -93,10 +93,10 @@ static UUtBool iDebuggerMessageBox(char *msg)
 
 		// bring up the dialog		
 		UUrString_Cat(buffer, UUmNL UUmNL "(Retry will enter the debugger)", MAX_STRING_LENGTH);
-		ShowCursor(TRUE);
+		SDL_ShowCursor(SDL_ENABLE);
 		msgbox_result = MessageBox(NULL, buffer, "Assertion Failed", 
 							MB_TASKMODAL|MB_ICONHAND|MB_ABORTRETRYIGNORE|MB_SETFOREGROUND);
-		ShowCursor(FALSE);
+		SDL_ShowCursor(SDL_DISABLE);
 
 		// restore the quit message if required
 		if (bQuit)

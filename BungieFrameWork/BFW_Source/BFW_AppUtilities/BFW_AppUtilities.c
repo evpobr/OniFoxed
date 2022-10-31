@@ -2541,9 +2541,9 @@ AUtMB_ButtonChoice UUcArglist_Call AUrMessageBox(AUtMB_ButtonType inButtonType, 
 		default: UUmAssert(0);
 	}
 
-	ShowCursor(TRUE);
+	SDL_ShowCursor(SDL_ENABLE);
 	return_value = MessageBox(NULL, buffer, "Message", type);
-	ShowCursor(FALSE);
+	SDL_ShowCursor(SDL_DISABLE);
 
 	switch(return_value)
 		{

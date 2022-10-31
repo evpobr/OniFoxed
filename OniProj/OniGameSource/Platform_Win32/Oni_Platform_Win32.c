@@ -267,7 +267,7 @@ UUtError ONrPlatform_Initialize(
 	
 	ONiPlatform_CreateWindow(outPlatformData);
 
-	ShowCursor(FALSE);	// FALSE = hide the cursor
+	SDL_ShowCursor(SDL_DISABLE);	// FALSE = hide the cursor
 	
 	return UUcError_None;
 }
