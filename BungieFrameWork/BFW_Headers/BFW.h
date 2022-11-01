@@ -1555,7 +1555,7 @@ extern "C" {
  */
 
 #if UUmCompiler	== UUmCompiler_VisC
-#define PROFILE 1
+#define PROFILE 0
 #endif
 	
 	typedef enum UUtProfileState
