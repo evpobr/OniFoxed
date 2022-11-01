@@ -70,23 +70,18 @@ static void
 ONiPlatform_CreateWindow(
 	ONtPlatformData		*ioPlatformData)
 {
-	UUtUns16 screen_width = GetSystemMetrics(SM_CXSCREEN);
-	UUtUns16 screen_height = GetSystemMetrics(SM_CYSCREEN);
+	SDL_DisplayMode desktopMode;
+	SDL_GetDesktopDisplayMode(0, &desktopMode);
 
-	ioPlatformData->sdlWindow = SDL_CreateWindow(
+	ioPlatformData->gameWindow = SDL_CreateWindow(
 		ONcMainWindowTitle,
 		ONcSurface_Left,
 		ONcSurface_Top,
-		screen_width,
-		screen_height,
+		desktopMode.w,
+		desktopMode.h,
 		SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
 
-	UUmAssert(ioPlatformData->sdlWindow != NULL);
-
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(ONgPlatformData.sdlWindow, &wmInfo);
-	ONgPlatformData.gameWindow = wmInfo.info.win.window;
+	UUmAssert(ioPlatformData->gameWindow != NULL);
 
 	return;
 }
@@ -112,7 +107,7 @@ UUtBool
 ONrPlatform_IsForegroundApp(
 	void)
 {
-	return (ONgPlatformData.gameWindow == GetForegroundWindow());
+	return (ONgPlatformData.gameWindow == SDL_GetKeyboardFocus());
 }
 
 // ----------------------------------------------------------------------
@@ -124,8 +119,8 @@ void ONrPlatform_Terminate(
 		fclose(ONgErrorFile);
 	}
 	
-	SDL_DestroyWindow(ONgPlatformData.sdlWindow);
-	ONgPlatformData.sdlWindow = NULL;
+	SDL_DestroyWindow(ONgPlatformData.gameWindow);
+	ONgPlatformData.gameWindow = NULL;
 	
 	SDL_Quit();
 }

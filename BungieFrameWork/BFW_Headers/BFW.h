@@ -1618,7 +1618,7 @@ FILE *UUrFOpen(
 #if UUmPlatform == UUmPlatform_Win32
 
 	typedef HINSTANCE			UUtAppInstance;
-	typedef HWND				UUtWindow;
+	typedef SDL_Window			*UUtWindow;
 
 #elif UUmPlatform == UUmPlatform_Mac
 

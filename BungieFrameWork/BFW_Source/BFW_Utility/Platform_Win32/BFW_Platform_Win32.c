@@ -761,14 +761,13 @@ UUrWindow_GetSize(
 	UUtUns16			*outWidth,
 	UUtUns16			*outHeight)
 {
-	RECT				rect;
+	int					w, h;
 	
 	UUmAssert(inWindow);
 	UUmAssert(outWidth);
 	UUmAssert(outHeight);
 	
-	GetWindowRect(inWindow, &rect);
-	
-	*outWidth = (UUtUns16)(rect.right - rect.left);
-	*outHeight = (UUtUns16)(rect.bottom - rect.top);
+	SDL_GL_GetDrawableSize(inWindow, &w, &h);
+	*outWidth = (UUtUns16)w;
+	*outHeight = (UUtUns16)h;
 }

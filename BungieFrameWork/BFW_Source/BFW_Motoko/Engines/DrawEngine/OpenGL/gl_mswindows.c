@@ -19,7 +19,7 @@ void M3rSetGamma(
 {
 	Uint16 ramp[256];
 	SDL_CalculateGammaRamp(inGamma + 0.5f, ramp);
-	SDL_SetWindowGammaRamp(ONgPlatformData.sdlWindow, ramp, ramp, ramp);
+	SDL_SetWindowGammaRamp(ONgPlatformData.gameWindow, ramp, ramp, ramp);
 
 	return;
 }
@@ -30,14 +30,14 @@ static boolean gl_create_render_context(
 	UUtBool success;
 	if (!gl->context)
 	{
-		gl->context= SDL_GL_CreateContext(ONgPlatformData.sdlWindow);
+		gl->context= SDL_GL_CreateContext(ONgPlatformData.gameWindow);
 		if (!gl->context)
 		{
 			UUrDebuggerMessage("wglCreateContext() failed : %s", SDL_GetError());
 		}
 	}
 	success= ((gl->context != NULL) &&
-		SDL_GL_MakeCurrent(ONgPlatformData.sdlWindow, gl->context) == 0);
+		SDL_GL_MakeCurrent(ONgPlatformData.gameWindow, gl->context) == 0);
 	return success;
 }
 
@@ -62,7 +62,7 @@ UUtBool gl_platform_initialize(
 			.w = width,
 			.h = height
 		};
-	success = SDL_SetWindowDisplayMode(ONgPlatformData.sdlWindow, &mode) == 0;
+	success = SDL_SetWindowDisplayMode(ONgPlatformData.gameWindow, &mode) == 0;
 
 	if (success)
 	{
@@ -105,7 +105,7 @@ void gl_platform_dispose(
 void gl_display_back_buffer(
 	void)
 {
-	SDL_GL_SwapWindow(ONgPlatformData.sdlWindow);
+	SDL_GL_SwapWindow(ONgPlatformData.gameWindow);
 
 	return;
 }
