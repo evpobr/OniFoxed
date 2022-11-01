@@ -80,13 +80,66 @@ UUtUns32 *UUrBitVector_New(UUtUns32 size);
 void UUrBitVector_Dispose(UUtUns32 *vector);
 
 #if UUmCompiler	== UUmCompiler_VisC
-UUtBool __fastcall UUrBitVector_TestBit(const UUtUns32 *vector, UUtUns32 bit);
-UUtBool __fastcall UUrBitVector_TestAndSetBit(UUtUns32 *vector, UUtUns32 bit);
-UUtBool __fastcall UUrBitVector_TestAndClearBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_SetBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_ClearBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_ToggleBit(UUtUns32 *vector, UUtUns32 bit);
-UUtUns32 __fastcall UUrBitVector_FindFirstSet(UUtInt32 value);
+static inline UUtBool UUrBitVector_TestBit(const UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		bt [ecx], edx
+		setc al
+	}
+}
+
+static inline UUtBool UUrBitVector_TestAndSetBit(UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		bts [ecx], edx
+		setc al
+	}
+}
+
+static inline UUtBool UUrBitVector_TestAndClearBit(UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		btr [ecx], edx
+		setc al
+	}
+}
+
+static inline void UUrBitVector_SetBit(UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		bts [ecx], edx
+	}
+}
+
+static inline void UUrBitVector_ClearBit(UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		btr [ecx], edx
+	}
+}
+
+static inline void UUrBitVector_ToggleBit(UUtUns32 *bitVector, UUtUns32 bit)
+{
+	__asm
+	{
+		btc [ecx], edx
+	}
+}
+
+static inline UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 r3)
+{
+	__asm
+	{
+		mov eax, 32			// if ecx = 0, eax is unset so move 32 to eax
+		bsf eax, ecx		
+	}
+}
+
 #else
 UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 r3);
 
