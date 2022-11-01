@@ -227,6 +227,7 @@ extern "C" {
 	#if UUmPlatform == UUmPlatform_Win32
 		#if UUmCompiler	!= UUmCompiler_MWerks	
 			#include <windows.h>
+			#include <intrin.h>
 		#endif
 
 		#include <wtypes.h>

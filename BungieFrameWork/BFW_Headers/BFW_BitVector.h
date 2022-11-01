@@ -82,62 +82,38 @@ void UUrBitVector_Dispose(UUtUns32 *vector);
 #if UUmCompiler	== UUmCompiler_VisC
 static inline UUtBool UUrBitVector_TestBit(const UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		bt [ecx], edx
-		setc al
-	}
+	return _bittest(bitVector, bit);
 }
 
 static inline UUtBool UUrBitVector_TestAndSetBit(UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		bts [ecx], edx
-		setc al
-	}
+	return _bittestandset(bitVector, bit);
 }
 
 static inline UUtBool UUrBitVector_TestAndClearBit(UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		btr [ecx], edx
-		setc al
-	}
+	return _bittestandreset(bitVector, bit);
 }
 
 static inline void UUrBitVector_SetBit(UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		bts [ecx], edx
-	}
+	_bittestandset(bitVector, bit);
 }
 
 static inline void UUrBitVector_ClearBit(UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		btr [ecx], edx
-	}
+	_bittestandreset(bitVector, bit);
 }
 
 static inline void UUrBitVector_ToggleBit(UUtUns32 *bitVector, UUtUns32 bit)
 {
-	__asm
-	{
-		btc [ecx], edx
-	}
+	_bittestandcomplement(bitVector, bit);
 }
 
 static inline UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 r3)
 {
-	__asm
-	{
-		mov eax, 32			// if ecx = 0, eax is unset so move 32 to eax
-		bsf eax, ecx		
-	}
+	unsigned long index;
+	return _BitScanForward(&index, r3) == 1 ? index : 32;
 }
 
 #else
