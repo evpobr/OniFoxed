@@ -25,7 +25,9 @@
 	#define USE_PROFILE_MEMDEBUG	0
 	#define UUmDebugDelete			0
 
+	#ifndef SHIPPING_VERSION
 	#define SHIPPING_VERSION	0
+	#endif
 
 	#if SHIPPING_VERSION
 	#define STAND_ALONE_ONLY 1

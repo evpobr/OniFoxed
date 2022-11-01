@@ -30,7 +30,9 @@
 
 	#endif
 
+	#ifndef SHIPPING_VERSION
 	#define SHIPPING_VERSION	1
+	#endif
 
 	#if SHIPPING_VERSION
 	#define STAND_ALONE_ONLY 1

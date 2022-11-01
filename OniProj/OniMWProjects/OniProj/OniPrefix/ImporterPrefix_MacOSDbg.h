@@ -12,7 +12,9 @@
 
 	#define UUmDebuggerSymFileName	"MacOSDbg_Imp.xSYM"
 
+	#ifndef SHIPPING_VERSION
 	#define SHIPPING_VERSION	0
+	#endif
 
 	#if SHIPPING_VERSION
 	#define STAND_ALONE_ONLY 1

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16.0)
 
 project(Oni LANGUAGES C)
 
+option(Oni_SHIPPING_VERSION "" OFF)
+
 list(APPEND CMAKE_MODULE_PATH ${Oni_SOURCE_DIR}/cmake/modules)
 
 find_package(Bink)
@@ -492,6 +494,10 @@ add_executable(Oni WIN32
     OniProj/OniGameSource/Oni_TextureMaterials.h
     OniProj/OniGameSource/Oni_Weapon.c
     OniProj/OniGameSource/Oni_Weapon.h)
+
+if(Oni_SHIPPING_VERSION)
+    target_compile_definitions(Oni PRIVATE SHIPPING_VERSION=1)
+endif()
 
 target_include_directories(Oni
     PRIVATE
