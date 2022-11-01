@@ -16,6 +16,8 @@
 #include <mmreg.h>
 #include <msacm.h>
 
+#include <SDL_mixer.h>
+
 // ======================================================================
 // defines
 // ======================================================================
@@ -28,8 +30,8 @@ typedef CRITICAL_SECTION		SStGuard;
 
 typedef struct SStSoundChannel_PlatformData
 {
-	LPDIRECTSOUNDBUFFER			soundBuffer;
-	LPDIRECTSOUND3DBUFFER		soundBuffer3D;
+	Mix_Chunk					*soundBuffer;
+	int							soundChannel;
 	
 	UUtUns32					buffer_size;
 	UUtUns32					buffer_pos[SScNotifiesPerChannel];

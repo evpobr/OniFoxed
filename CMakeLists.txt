@@ -6,6 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${Oni_SOURCE_DIR}/cmake/modules)
 
 find_package(Bink)
 find_package(SDL2)
+find_package(SDL2_mixer)
 find_package(OpenGL COMPONENTS OpenGL)
 
 
@@ -614,6 +615,7 @@ if(WIN32)
     target_link_libraries(Oni
         PRIVATE
             SDL2::SDL2
+            SDL2_mixer::SDL2_mixer
             OpenGL::GL
             winmm
             msacm32
