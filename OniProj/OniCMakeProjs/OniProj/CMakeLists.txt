@@ -286,11 +286,6 @@ set(SOURCE_FILES
 
         ../../../BungieFrameWork/BFW_Source/BFW_Materials/BFW_Materials.c
 
-        ../../../BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/bink.h
-        ../../../BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/Rad.h
-
-        ../../../BungieFrameWork/BFW_Source/BFW_Bink/BFW_Bink.c
-
         ###############################################################################
         #Game code
 

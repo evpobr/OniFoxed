@@ -57,7 +57,9 @@
 #include "Oni_Weapon.h"
 #include "Oni_InGameUI.h"
 
+#if defined ONI_BINK_VIDEO && ONI_BINK_VIDEO == 1
 #include "Oni_Bink.h"
+#endif
 #include "gl_engine.h"
 
 #if DEBUGGING
@@ -319,10 +321,12 @@ ONiInitializeAll(
 	UUrStartupMessage("initializing oni sound");
  	error = OSrInitialize();
  	UUmError_ReturnOnError(error);
-	
+
+#if defined ONI_BINK_VIDEO && ONI_BINK_VIDEO == 1	
 	UUrStartupMessage("initializing oni movie");
 	error = ONrMovie_Initialize();
 	UUmError_ReturnOnError(error);
+#endif
 		
 	UUrStartupMessage("initializing the pause screen");
 	error = ONrInGameUI_Initialize();
@@ -575,7 +579,7 @@ ONiRunGame(
 
 					if (19 == old_level) {
 						ONrPersist_MarkWonGame();
-
+#if defined ONI_BINK_VIDEO && ONI_BINK_VIDEO == 1
 						if (NULL != strstr(gl->renderer, "3Dfx")) {
 							ONrMovie_Play_Hardware("outro.bik", BKcScale_Fill_Window);
 						}
@@ -584,6 +588,7 @@ ONiRunGame(
 							play_ending_movie_at_exit= UUcTrue;
 #endif
 						}
+#endif
 
 						ONgTerminateGame = UUcTrue;
 					}
@@ -835,6 +840,8 @@ void OniExit(
 	UUrMemory_Block_VerifyList();
 
 	M3rTerminate();
+
+#if defined ONI_BINK_VIDEO && ONI_BINK_VIDEO == 1
     
 #ifndef USE_OPENGL_WITH_BINK
     // now is the time to play the ending movie if we're going to do it in software
@@ -843,6 +850,8 @@ void OniExit(
     {
         ONrMovie_Play("outro.bik", BKcScale_Fill_Window);
     }
+#endif
+
 #endif
     
 	LIrTerminate();
@@ -959,12 +968,16 @@ ONiMain(
 	 */
 		error = ONrLevel_LoadZero();
 		UUmError_ReturnOnErrorMsg(error, "Could not load level zero");
-		
+
+#if defined ONI_BINK_VIDEO && ONI_BINK_VIDEO == 1
+
 #ifndef USE_OPENGL_WITH_BINK
 	/*
 	 * play movie before OpenGL takes over
 	 */
 		ONrMovie_Play("intro.bik", BKcScale_Fill_Window);
+#endif
+
 #endif
 
 	/*

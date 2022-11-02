@@ -25,7 +25,6 @@ add_executable(Oni WIN32
     BungieFrameWork/BFW_Headers/BFW_Akira.h
     BungieFrameWork/BFW_Headers/BFW_AppUtilities.h
     BungieFrameWork/BFW_Headers/BFW_BinaryData.h
-    BungieFrameWork/BFW_Headers/BFW_Bink.h
     BungieFrameWork/BFW_Headers/BFW_BitVector.h
     BungieFrameWork/BFW_Headers/BFW_Collision.h
     BungieFrameWork/BFW_Headers/BFW_CommandLine.h
@@ -305,11 +304,6 @@ add_executable(Oni WIN32
 
     BungieFrameWork/BFW_Source/BFW_Materials/BFW_Materials.c
 
-    BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/bink.h
-    BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/Rad.h
-
-    BungieFrameWork/BFW_Source/BFW_Bink/BFW_Bink.c
-
     ###############################################################################
     #Game code
 
@@ -435,8 +429,6 @@ add_executable(Oni WIN32
     OniProj/OniGameSource/Oni.h
     OniProj/OniGameSource/Oni_Aiming.c
     OniProj/OniGameSource/Oni_Aiming.h
-    OniProj/OniGameSource/Oni_Bink.c
-    OniProj/OniGameSource/Oni_Bink.h
     OniProj/OniGameSource/Oni_Camera.c
     OniProj/OniGameSource/Oni_Camera.h
     OniProj/OniGameSource/Oni_Camera_Templates.c
@@ -568,7 +560,14 @@ target_include_directories(Oni
 target_precompile_headers(Oni PRIVATE ${Oni_SOURCE_DIR}/BungieFrameWork/BFW_Headers/BFW_MasterHeader.h)
 
 if(ONI_BINK_VIDEO)
+    message("BINK!")
     target_link_libraries(Oni PRIVATE Bink::Bink)
+    target_sources(Oni
+        PRIVATE
+            BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/bink.h
+            BungieFrameWork/BFW_Source/BFW_Bink/BinkHeaders/Rad.h   
+            BungieFrameWork/BFW_Source/BFW_Bink/BFW_Bink.c
+            BungieFrameWork/BFW_Source/BFW_Bink/BFW_Bink.h)
 endif()
 
 set(ONI_MAP_PATH $<TARGET_FILE_DIR:Oni>/$<TARGET_FILE_NAME:Oni>.map)

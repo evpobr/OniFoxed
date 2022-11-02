@@ -13,8 +13,12 @@
 #include "Oni_Motoko.h"
 #include "Oni_Persistance.h"
 
+#if defined BINK_VIDEO && BINK_VIDEO == 1
+
 #include "bink.h"
 #include "Rad.h"
+
+#endif
 
 #include "gl_engine.h"
 
@@ -35,6 +39,14 @@
 // ======================================================================
 // typedefs
 // ======================================================================
+
+#if !defined BINK_VIDEO || BINK_VIDEO == 0
+
+typedef void	*HBINK;
+typedef void	*HBINKBUFFER;
+
+#endif
+
 typedef struct BKtBuffer
 {
 	HBINKBUFFER					bink_buffer;
