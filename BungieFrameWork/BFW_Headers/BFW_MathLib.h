@@ -60,7 +60,39 @@ UUtInt32 MUrUnsignedSmallFloat_ShiftLeft_To_Int_Round(float f, UUtInt32 shiftLef
 // shiftLeftValue 0 .. 22
 // returns ROUND(float * 2 ^ (shiftLeftValue))
 UUtUns32 MUrUnsignedSmallFloat_ShiftLeft_To_Uns_Round(float f, UUtInt32 shiftLeftValue);
-UUtInt32 MUrFloat_Round_To_Int(float f);
+
+static inline UUtInt32 MUrFloat_Round_To_Int(float inFloatNumber)
+{
+#if UUmCompiler	== UUmCompiler_VisC & defined(_M_IX86)
+
+	UUtInt32 i;
+
+	_asm {
+	  fld	inFloatNumber;
+	  fistp	i;
+	}
+
+	return i;
+
+#else
+
+	UUtInt32 integerNumber;
+//	#define MUrFloat_Round_To_Int(x) (((x) < 0.0) ? (float)((UUtInt32)(x - 0.5)) : (float)((UUtInt32)(x + 0.5)))
+
+	if (inFloatNumber < 0) 
+	{
+		integerNumber = inFloatNumber - 0.5f;
+	}
+	else
+	{
+		integerNumber = inFloatNumber + 0.5f;
+	}
+
+	return integerNumber;
+
+#endif
+}
+
 UUtUns8 MUrFloat0ToLessThan1_ToUns8(float f);
 
 //
