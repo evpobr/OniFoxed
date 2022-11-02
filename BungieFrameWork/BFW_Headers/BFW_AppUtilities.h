@@ -732,17 +732,10 @@ extern "C"
 		UUtUns32 pages[1];
 	} AUtDict;
 
-#if UUmCompiler	== UUmCompiler_VisC
-	AUtDict *AUrDict_New(UUtUns32 inMaxEntries, UUtUns32 inRange);
-	void AUrDict_Clear(AUtDict *inDict);
-	void AUrDict_Dispose(AUtDict *inDict);
-	UUtBool __fastcall AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key);
-#else
 	AUtDict *AUrDict_New(UUtUns32 inMaxEntries, UUtUns32 inRange);
 	void AUrDict_Clear(AUtDict *inDict);
 	void AUrDict_Dispose(AUtDict *inDict);
 	UUtBool AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key);
-#endif
 
 	static UUcInline UUtBool AUrDict_Test(AUtDict *inDict, UUtUns32 key)
 	{

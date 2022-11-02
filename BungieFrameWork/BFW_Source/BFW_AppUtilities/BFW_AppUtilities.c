@@ -3489,87 +3489,6 @@ void AUrDict_Dispose(AUtDict *inDict)
 	UUrMemory_Block_Delete(inDict);
 }
 
-#if UUmCompiler	== UUmCompiler_VisC
-
-#if 1
-__declspec( naked ) UUtBool __fastcall AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key)
-{
-	__asm
-	{
-		// ecx = inDict
-		// edx = key
-
-		push        esi
-		mov         esi,ecx
-
-		// ecx = inDict
-		// esi = inDict
-		// edx = key
-
-		mov         ecx, [esi]inDict.vector
-
-		// ecx = inDict.vector
-		// esi = inDict
-		// edx = key
-
-		mov			eax, 1
-		bts			[ecx], edx
-
-		jc			Dict_exit
-
-		// if not in the dictionary
-		mov         ecx, [esi]inDict.numPages
-		mov			eax, [esi]inDict.maxPages
-
-		// eax = inDict.maxPages
-		// ecx = inDict.numPages
-		// esi = inDict
-		// edx = key
-
-		cmp			ecx, eax
-		jge			Dict_not_enough_pages		// if ecx (numpages) >= eax (maxpages) goto Dict_not_enough_pages
-		
-		mov         [esi]inDict.pages[ecx*4], edx
-		// inc         [esi]inDict.numPages
-		inc			ecx
-		mov			[esi]inDict.numPages, ecx
-
-		Dict_not_enough_pages:
-
-		xor			eax, eax
-
-		Dict_exit:
-
-		pop         esi
-
-		ret
-	}
-}
-#else
-UUtBool __fastcall AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key)
-{
-	UUtBool inDictionary;
-
-	UUmAssertWritePtr(inDict, sizeof(*inDict));
-	
-	inDictionary = UUrBitVector_TestAndSetBit(inDict->vector, key);
-
-	if (!inDictionary)
-	{
-		if (inDict->numPages >= inDict->maxPages) {
-			UUmAssert(!"if we got here then we have set a bit we will not clear which is bad");
-			return inDictionary;
-		}
-
-		inDict->pages[inDict->numPages] = key;
-		inDict->numPages++;
-	}
-
-	return inDictionary;
-}
-#endif
-
-#else
 UUtBool AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key)
 {
 	UUtBool inDictionary;
@@ -3589,7 +3508,6 @@ UUtBool AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key)
 
 	return inDictionary;
 }
-#endif
 
 /* prototypes for local routines */
 
