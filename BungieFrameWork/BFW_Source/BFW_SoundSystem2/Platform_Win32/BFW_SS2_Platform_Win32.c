@@ -22,6 +22,8 @@
 #include <mmreg.h>
 #include <msacm.h>
 
+#include <GLFW/glfw3native.h>
+
 // ======================================================================
 // defines
 // ======================================================================
@@ -1598,7 +1600,7 @@ SS2rPlatform_Initialize(
 	UUrStartupMessage("setting the direct sound cooperative level");
 
 	// set cooperative level
-	result = IDirectSound_SetCooperativeLevel(SSgDirectSound, inWindow, /*DSSCL_NORMAL*/ DSSCL_PRIORITY);
+	result = IDirectSound_SetCooperativeLevel(SSgDirectSound, glfwGetWin32Window(inWindow), /*DSSCL_NORMAL*/ DSSCL_PRIORITY);
 	if (result != DS_OK)
 	{
 		UUrStartupMessage("failed to set the cooperative level");

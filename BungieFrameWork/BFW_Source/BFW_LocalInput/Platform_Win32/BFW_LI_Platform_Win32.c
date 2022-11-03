@@ -18,6 +18,8 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
+#include <GLFW/glfw3native.h>
+
 
 // ======================================================================
 // defines
@@ -27,7 +29,7 @@
 // ======================================================================
 // globals
 // ======================================================================
-static UUtWindow			LIgWindow;
+static HWND					LIgWindow;
 static UUtBool				LIgUseDirectInput;
 
 // WindowsNT 4 vars
@@ -1057,24 +1059,24 @@ LIrPlatform_InputEvent_InterpretModifiers(
 		case LIcInputEvent_MMouseUp:
 		case LIcInputEvent_RMouseDown:
 		case LIcInputEvent_RMouseUp:
-			if (inModifiers & MK_SHIFT)
+			if (inModifiers & GLFW_MOD_SHIFT)
 				outModifiers |= LIcMouseState_ShiftDown;
-			if (inModifiers & MK_CONTROL)
+			if (inModifiers & GLFW_MOD_CONTROL)
 				outModifiers |= LIcMouseState_ControlDown;
-			if (inModifiers & MK_RBUTTON)
-				outModifiers |= LIcMouseState_RButtonDown;
-			if (inModifiers & MK_LBUTTON)
-				outModifiers |= LIcMouseState_LButtonDown;
+			// if (inModifiers & MK_RBUTTON)
+			// 	outModifiers |= LIcMouseState_RButtonDown;
+			// if (inModifiers & MK_LBUTTON)
+			// 	outModifiers |= LIcMouseState_LButtonDown;
 		break;
 		
 		case LIcInputEvent_KeyUp:
 		case LIcInputEvent_KeyDown:
 		case LIcInputEvent_KeyRepeat:
-			if (inModifiers & MK_SHIFT)
+			if (inModifiers & GLFW_MOD_SHIFT)
 				outModifiers |= LIcKeyState_ShiftDown;
-			if (inModifiers & MK_CONTROL)
+			if (inModifiers & GLFW_MOD_CONTROL)
 				outModifiers |= LIcKeyState_CommandDown;
-			if (inModifiers & MK_ALT)
+			if (inModifiers & GLFW_MOD_ALT)
 				outModifiers |= LIcKeyState_AltDown;
 		break;
 	}
@@ -1177,7 +1179,7 @@ LIrPlatform_Initialize(
 	LIgDirectInput				= NULL;
 	LIgCenter.x					= 0;
 	LIgCenter.y					= 0;
-	LIgWindow					= inWindow;
+	LIgWindow					= glfwGetWin32Window(inWindow);
 	LIgSetCursorPosThisFrame	= UUcFalse;
 	
 	// find out which OS the game is running under
@@ -1291,32 +1293,9 @@ UUtBool
 LIrPlatform_Update(
 	LItMode					inMode)
 {
-	BOOL					was_event;
-	UUtUns16				itr = LIcPlatform_MaxRetries;
+	glfwPollEvents();
 	
-	// check the windows message queue LIcPlatform_MaxRetries times
-	do
-	{
-		MSG					message;
-
-		// get keyboard events and mouse events for the window associate
-		// with this local input context
-		was_event =
-			PeekMessage(
-				&message,
-				LIgWindow,
-				0,
-				0,
-				PM_REMOVE);
-		if (was_event)
-		{
-			TranslateMessage(&message);
-			DispatchMessage(&message);
-		}
-	}
-	while (--itr);
-	
-	return was_event;
+	return TRUE;
 }
 
 // ----------------------------------------------------------------------

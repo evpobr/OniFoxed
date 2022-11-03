@@ -20,6 +20,8 @@
 
 #include <windows.h>
 
+#include <GLFW/glfw3native.h>
+
 #include "BFW_Motoko.h"
 #include "BFW_LocalInput.h"
 #include "BFW_AppUtilities.h"
@@ -30,6 +32,11 @@
 #include "Oni_Platform.h"
 
 #include "BFW_Console.h"
+
+struct OniGLFWKeyboardMap {
+	LItKeyCode	oniKeyCode;
+	int			glfwKey;
+};
 
 // ======================================================================
 // defines
@@ -57,6 +64,8 @@ HINSTANCE	ONgAppHInstance = NULL;
 int			ONgICmdShow;
 FILE*		ONgErrorFile = NULL;
 UUtBool		ONgShiftDown = UUcFalse;
+static int	ONgKeyModifiers;
+IMtPoint2D	ONgMousePos;
 
 // ======================================================================
 // prototypes
@@ -67,282 +76,334 @@ void UUcExternal_Call main(int argc, char *argv[]);
 // functions
 // ======================================================================
 // ----------------------------------------------------------------------
-static void
-ONiHandleMouseEvent(
-	UINT	iMsg,
-	WPARAM	wParam,
-	LPARAM	lParam)
+
+static UUtUns32 ONiTranslateGLFWKey(int key)
 {
-	LItInputEventType		event_type;
-	IMtPoint2D				mouse_pos;
-	
-	switch (iMsg)
-	{
-		case WM_MOUSEMOVE:		event_type = LIcInputEvent_MouseMove;		break;
-		case WM_LBUTTONDOWN:	event_type = LIcInputEvent_LMouseDown;		break;
-		case WM_LBUTTONDBLCLK:	event_type = LIcInputEvent_LMouseDown;		break;
-		case WM_LBUTTONUP:		event_type = LIcInputEvent_LMouseUp;		break;
-		case WM_RBUTTONDOWN:	event_type = LIcInputEvent_RMouseDown;		break;
-		case WM_RBUTTONDBLCLK:	event_type = LIcInputEvent_RMouseDown;		break;
-		case WM_RBUTTONUP:		event_type = LIcInputEvent_RMouseUp;		break;
-		case WM_MBUTTONDOWN:	event_type = LIcInputEvent_MMouseDown;		break;
-		case WM_MBUTTONDBLCLK:	event_type = LIcInputEvent_MMouseDown;		break;
-		case WM_MBUTTONUP:		event_type = LIcInputEvent_MMouseUp;		break;
-	}
-	
-	mouse_pos.x = LOWORD(lParam);
-	mouse_pos.y = HIWORD(lParam);
-	LIrInputEvent_Add(event_type, &mouse_pos, 0, wParam);
-}	
+	switch (key) {
+	case GLFW_KEY_SPACE:
+		return LIcKeyCode_Space;
+	case GLFW_KEY_APOSTROPHE:
+		return LIcKeyCode_Apostrophe;
+	case GLFW_KEY_COMMA:
+		return LIcKeyCode_Comma;
+	case GLFW_KEY_MINUS:
+		return LIcKeyCode_Minus;
+	case GLFW_KEY_PERIOD:
+		return LIcKeyCode_Period;
+	case GLFW_KEY_SLASH:
+		return LIcKeyCode_Slash;
+	case GLFW_KEY_0:
+		return LIcKeyCode_0;
+	case GLFW_KEY_1:
+		return LIcKeyCode_1;
+	case GLFW_KEY_2:
+		return LIcKeyCode_2;
+	case GLFW_KEY_3:
+		return LIcKeyCode_3;
+	case GLFW_KEY_4:
+		return LIcKeyCode_4;
+	case GLFW_KEY_5:
+		return LIcKeyCode_5;
+	case GLFW_KEY_6:
+		return LIcKeyCode_6;
+	case GLFW_KEY_7:
+		return LIcKeyCode_7;
+	case GLFW_KEY_8:
+		return LIcKeyCode_8;
+	case GLFW_KEY_9:
+		return LIcKeyCode_9;
+	case GLFW_KEY_SEMICOLON:
+		return LIcKeyCode_Semicolon;
+	case GLFW_KEY_EQUAL:
+		return LIcKeyCode_Equals;
+	case GLFW_KEY_A:
+		return LIcKeyCode_A;
+	case GLFW_KEY_B:
+		return LIcKeyCode_B;
+	case GLFW_KEY_C:
+		return LIcKeyCode_C;
+	case GLFW_KEY_D:
+		return LIcKeyCode_D;
+	case GLFW_KEY_E:
+		return LIcKeyCode_E;
+	case GLFW_KEY_F:
+		return LIcKeyCode_F;
+	case GLFW_KEY_G:
+		return LIcKeyCode_G;
+	case GLFW_KEY_H:
+		return LIcKeyCode_H;
+	case GLFW_KEY_I:
+		return LIcKeyCode_I;
+	case GLFW_KEY_J:
+		return LIcKeyCode_J;
+	case GLFW_KEY_K:
+		return LIcKeyCode_K;
+	case GLFW_KEY_L:
+		return LIcKeyCode_L;
+	case GLFW_KEY_M:
+		return LIcKeyCode_M;
+	case GLFW_KEY_N:
+		return LIcKeyCode_N;
+	case GLFW_KEY_O:
+		return LIcKeyCode_O;
+	case GLFW_KEY_P:
+		return LIcKeyCode_P;
+	case GLFW_KEY_Q:
+		return LIcKeyCode_Q;
+	case GLFW_KEY_R:
+		return LIcKeyCode_R;
+	case GLFW_KEY_S:
+		return LIcKeyCode_S;
+	case GLFW_KEY_T:
+		return LIcKeyCode_T;
+	case GLFW_KEY_U:
+		return LIcKeyCode_U;
+	case GLFW_KEY_V:
+		return LIcKeyCode_V;
+	case GLFW_KEY_W:
+		return LIcKeyCode_W;
+	case GLFW_KEY_X:
+		return LIcKeyCode_X;
+	case GLFW_KEY_Y:
+		return LIcKeyCode_Y;
+	case GLFW_KEY_Z:
+		return LIcKeyCode_Z;
+	case GLFW_KEY_LEFT_BRACKET:
+		return LIcKeyCode_LeftBracket;
+	case GLFW_KEY_BACKSLASH:
+		return LIcKeyCode_BackSlash;
+	case GLFW_KEY_RIGHT_BRACKET:
+		return LIcKeyCode_RightBracket;
+	case GLFW_KEY_GRAVE_ACCENT:
+		return LIcKeyCode_Grave;
+	// case GLFW_KEY_WORLD_1:
+	// case GLFW_KEY_WORLD_2:
+	case GLFW_KEY_ESCAPE:
+		return  LIcKeyCode_Escape;
+	case GLFW_KEY_ENTER:
+		return LIcKeyCode_Return;
+	case GLFW_KEY_TAB:
+		return LIcKeyCode_Tab;
+	case GLFW_KEY_BACKSPACE:
+		return LIcKeyCode_BackSpace;
+	case GLFW_KEY_INSERT:
+		return LIcKeyCode_Insert;
+	case GLFW_KEY_DELETE:
+		return LIcKeyCode_Delete;
+	case GLFW_KEY_RIGHT:
+		return LIcKeyCode_RightArrow;
+	case GLFW_KEY_LEFT:
+		return LIcKeyCode_LeftArrow;
+	case GLFW_KEY_DOWN:
+		return LIcKeyCode_DownArrow;
+	case GLFW_KEY_UP:
+		return LIcKeyCode_UpArrow;
+	case GLFW_KEY_PAGE_UP:
+		return LIcKeyCode_PageUp;
+	case GLFW_KEY_PAGE_DOWN:
+		return LIcKeyCode_PageDown;
+	case GLFW_KEY_HOME:
+		return LIcKeyCode_Home;
+	case GLFW_KEY_END:
+		return LIcKeyCode_End;
+	case GLFW_KEY_CAPS_LOCK:
+		return LIcKeyCode_CapsLock;
+	case GLFW_KEY_SCROLL_LOCK:
+		return LIcKeyCode_ScrollLock;
+	case GLFW_KEY_NUM_LOCK:
+		return LIcKeyCode_NumLock;
+	case GLFW_KEY_PRINT_SCREEN:
+		return LIcKeyCode_PrintScreen;
+	case GLFW_KEY_PAUSE:
+		return LIcKeyCode_Pause;
+	case GLFW_KEY_F1:
+		return LIcKeyCode_F1;
+	case GLFW_KEY_F2:
+		return LIcKeyCode_F2;
+	case GLFW_KEY_F3:
+		return LIcKeyCode_F3;
+	case GLFW_KEY_F4:
+		return LIcKeyCode_F4;
+	case GLFW_KEY_F5:
+		return LIcKeyCode_F5;
+	case GLFW_KEY_F6:
+		return LIcKeyCode_F6;
+	case GLFW_KEY_F7:
+		return LIcKeyCode_F7;
+	case GLFW_KEY_F8:
+		return LIcKeyCode_F8;
+	case GLFW_KEY_F9:
+		return LIcKeyCode_F9;
+	case GLFW_KEY_F10:
+		return LIcKeyCode_F10;
+	case GLFW_KEY_F11:
+		return LIcKeyCode_F11;
+	case GLFW_KEY_F12:
+		return LIcKeyCode_F12;
+	case GLFW_KEY_F13:
+		return LIcKeyCode_F13;
+	case GLFW_KEY_F14:
+		return LIcKeyCode_F14;
+	case GLFW_KEY_F15:
+		return LIcKeyCode_F15;
+	// case GLFW_KEY_F16:
+	// case GLFW_KEY_F17:
+	// case GLFW_KEY_F18:
+	// case GLFW_KEY_F19:
+	// case GLFW_KEY_F20:
+	// case GLFW_KEY_F21:
+	// case GLFW_KEY_F22:
+	// case GLFW_KEY_F23:
+	// case GLFW_KEY_F24:
+	// case GLFW_KEY_F25:
+	case GLFW_KEY_KP_0:
+		return  LIcKeyCode_NumPad0;
+	case GLFW_KEY_KP_1:
+		return  LIcKeyCode_NumPad1;
+	case GLFW_KEY_KP_2:
+		return  LIcKeyCode_NumPad2;
+	case GLFW_KEY_KP_3:
+		return  LIcKeyCode_NumPad3;
+	case GLFW_KEY_KP_4:
+		return  LIcKeyCode_NumPad4;
+	case GLFW_KEY_KP_5:
+		return  LIcKeyCode_NumPad5;
+	case GLFW_KEY_KP_6:
+		return  LIcKeyCode_NumPad6;
+	case GLFW_KEY_KP_7:
+		return  LIcKeyCode_NumPad7;
+	case GLFW_KEY_KP_8:
+		return  LIcKeyCode_NumPad8;
+	case GLFW_KEY_KP_9:
+		return  LIcKeyCode_NumPad9;
+	case GLFW_KEY_KP_DECIMAL:
+		return  LIcKeyCode_Decimal;
+	case GLFW_KEY_KP_DIVIDE:
+		return LIcKeyCode_Divide;
+	case GLFW_KEY_KP_MULTIPLY:
+		return LIcKeyCode_Multiply;
+	case GLFW_KEY_KP_SUBTRACT:
+		return LIcKeyCode_Subtract;
+	case GLFW_KEY_KP_ADD:
+		return LIcKeyCode_Add;
+	case GLFW_KEY_KP_ENTER:
+		return LIcKeyCode_NumPadEnter;
+	case GLFW_KEY_KP_EQUAL:
+		return LIcKeyCode_NumPadEquals;
+	case GLFW_KEY_LEFT_SHIFT:
+		return LIcKeyCode_LeftShift;
+	case GLFW_KEY_LEFT_CONTROL:
+		return LIcKeyCode_LeftControl;
+	case GLFW_KEY_LEFT_ALT:
+		return LIcKeyCode_LeftAlt;
+	case GLFW_KEY_LEFT_SUPER:
+		return LIcKeyCode_LeftWindowsKey;
+	case GLFW_KEY_RIGHT_SHIFT:
+		return LIcKeyCode_RightShift;
+	case GLFW_KEY_RIGHT_CONTROL:
+		return LIcKeyCode_RightControl;
+	case GLFW_KEY_RIGHT_ALT:
+		return LIcKeyCode_RightAlt;
+	case GLFW_KEY_RIGHT_SUPER:
+		return LIcKeyCode_RightWindowsKey;
+	case GLFW_KEY_MENU:
+		return LIcKeyCode_AppMenuKey;
+	default:
+		return LIcKeyCode_None;
+	};
+}
 
 // ----------------------------------------------------------------------
-static LRESULT CALLBACK ONiPlatform_WindowProc(
-	HWND	hWind,
-	UINT	iMsg,
-	WPARAM	wParam,
-	LPARAM	lParam)
+void ONiHandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	LRESULT				result;
-	static UUtUns32		modifiers = 0;
-	static UUtUns32		previous_key = 0;
-	static UUtBool		add_char;
+	LItInputEventType inEventType;
 	
-	switch(iMsg)
-	{
-		case WM_CHAR:
-			if (add_char)
-			{
-				if ((modifiers & MK_CONTROL) && (previous_key != 0))
-				{
-					LIrInputEvent_Add(LIcInputEvent_KeyDown, NULL, previous_key, modifiers);
-				}
-				else
-				{
-					LIrInputEvent_Add(LIcInputEvent_KeyDown, NULL, (UUtUns32)wParam, modifiers);
-				}
-			}
+	ONgKeyModifiers = mods;
+
+	switch (action) {
+	case GLFW_PRESS:
+		inEventType = LIcInputEvent_KeyDown;
 		break;
-		
-		case WM_KEYDOWN:
-			add_char = UUcFalse;
-			
-			switch(wParam)
-			{
-				case VK_SHIFT:
-					modifiers |= MK_SHIFT;
-				break;
-				
-				case VK_CONTROL:
-					modifiers |= MK_CONTROL;
-				break;
-				
-				case VK_TAB:
-				case VK_UP:
-				case VK_DOWN:
-				case VK_LEFT:
-				case VK_RIGHT:
-				case VK_PRIOR:
-				case VK_NEXT:
-				case VK_END:
-				case VK_HOME:
-				case VK_INSERT:
-				case VK_DELETE:
-				case VK_F1:
-				case VK_F2:
-				case VK_F3:
-				case VK_F4:
-				case VK_F5:
-				case VK_F6:
-				case VK_F7:
-				case VK_F8:
-				case VK_F9:
-				case VK_F10:
-				case VK_F11:
-				case VK_F12:
-					LIrInputEvent_Add(
-						LIcInputEvent_KeyDown,
-						NULL,
-						LIrPlatform_Win32_TranslateVirtualKey(wParam),
-						modifiers);
-				break;
-				
-				default:
-					add_char = UUcTrue;
-					previous_key = LIrPlatform_Win32_TranslateVirtualKey(wParam);
-				break;
-			}
+	case GLFW_RELEASE:
+		inEventType = LIcInputEvent_KeyUp;
 		break;
-		
-		case WM_KEYUP:
-			switch(wParam)
-			{
-				case VK_SHIFT:
-					modifiers &= ~MK_SHIFT;
-				break;
-				
-				case VK_CONTROL:
-					modifiers &= ~MK_CONTROL;
-				break;
-			}
+	case GLFW_REPEAT:
+		inEventType = LIcInputEvent_KeyRepeat;
 		break;
-		
-		case WM_MOUSEMOVE:
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONDBLCLK:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONDBLCLK:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONDBLCLK:
-		case WM_MBUTTONUP:
-			ONiHandleMouseEvent(iMsg, wParam, lParam);
-		return 0;
-				
-		case WM_ACTIVATE:
-		{
-			if (LOWORD(wParam) == WA_INACTIVE)
-			{		
-				// set the current mode to normal input
-				LIrGameIsActive(UUcFalse);
-			}
-			else
-			{
-				// restore the previous mode
-				LIrGameIsActive(UUcTrue);
-				modifiers = 0;
-			}
-		}
-		return 0;
-		
-		case WM_PAINT:
-		{
-			PAINTSTRUCT			ps;
-			HDC					hdc;
-			
-			hdc = BeginPaint(hWind, &ps);
-			PatBlt(hdc, 0, 0, 4096, 4096, BLACKNESS);
-			EndPaint(hWind, &ps);
-      	}
-      	return 0;
+	
+	default:
+		inEventType = LIcInputEvent_None;
+		break;
 	}
 
-	result = DefWindowProc(hWind, iMsg, wParam, lParam);
-
-	return result;
+	UUtUns32 inKey = ONiTranslateGLFWKey(key);
+	
+	LIrInputEvent_Add(inEventType, NULL, inKey, ONgKeyModifiers);
 }
 
-static UUtBool fullscreenCandidate(HWND hwnd) {
-    RECT  winRect;
-    RECT  dtRect;
-    UUtBool status = UUcFalse;
-    DWORD style = GetWindowLong (hwnd, GWL_STYLE);
+// ----------------------------------------------------------------------
+static void ONiHandleMousePosEvent(GLFWwindow* window, double xpos, double ypos)
+{
+	ONgMousePos.x = xpos;
+	ONgMousePos.y = ypos;
 
-    // Quake II sets   (WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS)
-    // Heretic II sets (WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_SYSMENU)
-    // TrueSpace4 sets (WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_SYSMENU | WS_THICKFRAME)
-    // This function needs to 
-    // return 0 for TrueSpace4, which wants a window and 
-    // return 1 for Quake II and Heretic II, which want fullscreen
+	// TODO: modifiers
+	LIrInputEvent_Add(LIcInputEvent_MouseMove, &ONgMousePos, 0, ONgKeyModifiers);
+}
 
-    if ( (style & WS_POPUP) && !(style & (WS_BORDER | WS_THICKFRAME)))
+// ----------------------------------------------------------------------
+static void ONiHandleMouseButtonEvent(GLFWwindow* window, int button, int action, int mods)
+{
+	ONgKeyModifiers = mods;
+
+	LItInputEventType inEventType;
+	
+	switch (button)
 	{
-        GetClientRect( hwnd, &winRect );
-        GetWindowRect( GetDesktopWindow(), &dtRect );
-        if ( !memcmp( &winRect, &dtRect, sizeof( RECT ) ) ) {
-            status = UUcTrue;
-        }
-    }
-
-    return status;
+	case GLFW_MOUSE_BUTTON_LEFT:
+		inEventType = action == GLFW_PRESS ? LIcInputEvent_LMouseDown : LIcInputEvent_LMouseUp;
+		break;
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		inEventType = action == GLFW_PRESS ? LIcInputEvent_RMouseDown : LIcInputEvent_RMouseUp;
+		break;
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		inEventType = action == GLFW_PRESS ? LIcInputEvent_MMouseDown : LIcInputEvent_MMouseUp;
+		break;
+	default:
+		inEventType = LIcInputEvent_None;
+		break;
+	}
+	
+	LIrInputEvent_Add(inEventType, &ONgMousePos, 0, ONgKeyModifiers);
 }
 
+// ----------------------------------------------------------------------
+void ONiHandleWindowFocusEvent(GLFWwindow* window, int focused)
+{
+	LIrGameIsActive(focused == GLFW_TRUE ? UUcTrue : UUcFalse);
+}
 
 // ----------------------------------------------------------------------
 static void
 ONiPlatform_CreateWindow(
 	ONtPlatformData		*ioPlatformData)
 {
-	WNDCLASSEX	windClass;
-	ATOM		atom;
-	UUtUns16	screen_width;
-	UUtUns16	screen_height;
+	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode *vidmode = glfwGetVideoMode(monitor);
 
-	if (FindWindow(ONcMainWindowClass, ONcMainWindowTitle) != NULL)
-	{
-		AUrMessageBox(AUcMBType_OK, "There is already an instance of the game running.");
-		exit(0);
-	}
+	ioPlatformData->gameWindow = glfwCreateWindow(
+		vidmode->width,
+		vidmode->height,
+		ONcMainWindowTitle,
+		monitor,
+		NULL);
+		
+	glfwSetKeyCallback(ioPlatformData->gameWindow, ONiHandleKeyEvent);
+	glfwSetCursorPosCallback(ioPlatformData->gameWindow, ONiHandleMousePosEvent);
+	glfwSetMouseButtonCallback(ioPlatformData->gameWindow, ONiHandleMouseButtonEvent);
+	glfwSetWindowFocusCallback(ioPlatformData->gameWindow, ONiHandleWindowFocusEvent);
 	
-	windClass.cbSize = sizeof(windClass);
-	windClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	windClass.lpfnWndProc = ONiPlatform_WindowProc;
-	windClass.cbClsExtra = 0;
-	windClass.cbWndExtra = 0;
-	windClass.hInstance = ioPlatformData->appInstance;
-	windClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	windClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windClass.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH/*WHITE_BRUSH*/);
-	windClass.lpszMenuName = NULL;
-	windClass.lpszClassName = ONcMainWindowClass;
-	windClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
-	atom = RegisterClassEx(&windClass);
-
-	// get the width and height of the screen
-	screen_width = GetSystemMetrics(SM_CXSCREEN);
-	screen_height = GetSystemMetrics(SM_CYSCREEN);
-
-	if (0 != atom)
-	{
-		ioPlatformData->gameWindow =
-			CreateWindowEx(
-				WS_EX_LEFT,
-				ONcMainWindowClass,
-				ONcMainWindowTitle,
-				WS_POPUP,
-				ONcSurface_Left,
-				ONcSurface_Top,
-				screen_width,
-				screen_height,
-				NULL,
-				NULL,
-				ioPlatformData->appInstance,
-				NULL);
-
-		ShowWindow(ioPlatformData->gameWindow, 1);
-		UpdateWindow(ioPlatformData->gameWindow);
-
-		UUmAssert(fullscreenCandidate(ioPlatformData->gameWindow));
-
-		//	UpdateWindow(ioPlatformData->gameWindow);
-		
-		#if 0 //defined(DEBUG_AKIRA) && DEBUG_AKIRA
-
-			ioPlatformData->akiraWindow =
-				CreateWindowEx(
-					WS_EX_LEFT,
-					ONcMainWindowClass,
-					ONcMainWindowTitle,
-					WS_POPUP,
-					ONcSurface_Width,
-					0,
-					512,
-					512,
-					NULL,
-					NULL,
-					ioPlatformData->appInstance,
-					NULL);
-		
-			ShowWindow(ioPlatformData->akiraWindow, 1);
-		
-		#endif
-
-	}
-	else
-	{
-		// error here
-	}
+	ioPlatformData->hWnd = glfwGetWin32Window(ioPlatformData->gameWindow);
 }
 
 
@@ -350,7 +411,9 @@ ONiPlatform_CreateWindow(
 UUtError ONrPlatform_Initialize(
 	ONtPlatformData			*outPlatformData)
 {
-	HRESULT			ddReturn = DD_OK;
+	if (glfwInit() == GLFW_FALSE) {
+		return UUcError_Generic;
+	}
 	
 	outPlatformData->appInstance = ONgAppHInstance;
 	
@@ -366,7 +429,8 @@ UUtBool
 ONrPlatform_IsForegroundApp(
 	void)
 {
-	return (ONgPlatformData.gameWindow == GetForegroundWindow());
+
+	return (ONgPlatformData.hWnd == GetForegroundWindow());
 }
 
 // ----------------------------------------------------------------------
@@ -377,6 +441,10 @@ void ONrPlatform_Terminate(
 	{
 		fclose(ONgErrorFile);
 	}
+
+	glfwDestroyWindow(ONgPlatformData.gameWindow);
+	
+	glfwTerminate();
 }
 
 // ----------------------------------------------------------------------

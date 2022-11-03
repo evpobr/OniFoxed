@@ -36,6 +36,7 @@ typedef struct ONtPlatformData
 {
 	UUtAppInstance 	appInstance;
 	UUtWindow		gameWindow;
+	HWND			hWnd;
 	
 	#if defined(DEBUGGING) && DEBUGGING
 		

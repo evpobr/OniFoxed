@@ -151,15 +151,7 @@ boolean initialize_opengl(
 		UUrStartupMessage("OpenGL version = %s", gl->version);
 		UUrStartupMessage("OpenGL extensions = %s", gl->extensions);
 
-		// vendor-specific code :(
-		if (strstr(gl->renderer, "Matrox"))
-		{
-			gl->gl_display_back_buffer= gl_matrox_display_back_buffer;
-		}
-		else
-		{
-			gl->gl_display_back_buffer= gl_display_back_buffer;
-		}
+		gl->gl_display_back_buffer= gl_display_back_buffer;
 
 		GL_FXN(glGetIntegerv)(GL_MAX_TEXTURE_UNITS_ARB, (int*)&gl->num_tmu);
 		GL_FXN(glGetIntegerv)(GL_MAX_TEXTURE_SIZE, (int*)&gl->max_texture_size);

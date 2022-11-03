@@ -46,12 +46,6 @@
 #define Z_SCALE		65535.f
 #endif
 
-// define this to load GL API functions dynamically (for MS Windows)
-// if not defined on MS Windows, be sure to link to opengl32.lib
-#if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
-#define GL_LOAD_API_DYNAMICALLY
-#endif
-
 #undef TRUE
 #undef FALSE
 #undef NONE
@@ -688,8 +682,6 @@ struct gl_state_global {
 
 	// platform-specific parameters
 #if defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Win32)
-	HDC device_context;
-	HGLRC render_context;
 	boolean gl_vsync_enabled;
 #elif defined(UUmPlatform) && (UUmPlatform == UUmPlatform_Mac)
 	void *context; // AGLContext

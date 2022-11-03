@@ -791,14 +791,13 @@ UUrWindow_GetSize(
 	UUtUns16			*outWidth,
 	UUtUns16			*outHeight)
 {
-	RECT				rect;
-	
 	UUmAssert(inWindow);
 	UUmAssert(outWidth);
 	UUmAssert(outHeight);
+
+	int width, height;
+	glfwGetFramebufferSize(inWindow, &width, &height);
 	
-	GetWindowRect(inWindow, &rect);
-	
-	*outWidth = (UUtUns16)(rect.right - rect.left);
-	*outHeight = (UUtUns16)(rect.bottom - rect.top);
+	*outWidth = width;
+	*outHeight = height;
 }

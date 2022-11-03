@@ -36,6 +36,7 @@ if (WIN32)
 endif ()
 
 target_precompile_headers(TEVCProj PRIVATE ../../../BungieFrameWork/BFW_Headers/BFW_MasterHeader.h)
+target_link_libraries(TEVCProj PRIVATE glfw3)
 
 if (MSVC)
     target_compile_options(TEVCProj

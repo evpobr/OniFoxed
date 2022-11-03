@@ -21,6 +21,8 @@
 #include <float.h>
 #include <limits.h>
 
+#include <GLFW/glfw3.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1639,7 +1641,7 @@ FILE *UUrFOpen(
 #if UUmPlatform == UUmPlatform_Win32
 
 	typedef HINSTANCE			UUtAppInstance;
-	typedef HWND				UUtWindow;
+	typedef GLFWwindow			*UUtWindow;
 
 #elif UUmPlatform == UUmPlatform_Mac
 

@@ -1,5 +1,8 @@
 project(Oni LANGUAGES C)
 
+find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+find_package(glfw3)
+
 set(SOURCE_FILES
         #Bungie Framework
         ../../../BungieFrameWork/BFW_Headers/BFW.h
@@ -508,8 +511,11 @@ if(WIN32)
 
             ../../OniResources/OniResources.rc
             ../../OniResources/resource.h)
+        target_compile_definitions(Oni PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
 	target_link_libraries(Oni
 		PRIVATE
+                        OpenGL::GL
+                        glfw
 			winmm
 			msacm32
 			ws2_32
