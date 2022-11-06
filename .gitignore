@@ -1,4 +1,5 @@
-﻿**/.vs
+﻿**/.vs*
+**/out/
 *.obj
 *.idb
 *.pdb
@@ -16,7 +17,7 @@
 
 #############################################
 # Project Directories
-/build/vs2019_x86/
+/*[Bb]uild*/
 /build/vs2022_x86/
 /cmake-build-debug/
 
