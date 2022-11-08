@@ -278,7 +278,7 @@ TEiExtract_DumpFile(
 			fprintf(infoFile, "\tname: %s"UUmNL, curSymbol->u.templateInfo.templateName);
 			fprintf(infoFile, "\tsizeof: %d"UUmNL, curSymbol->sizeofSize);
 			fprintf(infoFile, "\tvarElemSize: %d"UUmNL, curSymbol->u.templateInfo.varElemSize);
-			fprintf(infoFile, "\tChecksum: "UUmFS_UUtUns64  UUmNL, curSymbol->u.templateInfo.checksum);
+			fprintf(infoFile, "\tChecksum: %" PRIu64  UUmNL, curSymbol->u.templateInfo.checksum);
 			fprintf(infoFile, "*******************************************"UUmNL);
 		}
 		else if(curSymbol->kind == TEcTypeKind_Struct)
@@ -437,7 +437,7 @@ TErExtract(
 	BFrFile_Printf(cFile, "#include \"BFW.h\""UUmNL);
 	BFrFile_Printf(cFile, "#include \"BFW_TemplateManager.h\""UUmNL);
 	BFrFile_Printf(cFile, "#include \"BFW_TM_Private.h\""UUmNL);
-	BFrFile_Printf(cFile, "UUtUns64 TMgTemplateChecksum = "UUmFS_UUtUns64 ";" UUmNL, totalChecksum);
+	BFrFile_Printf(cFile, "UUtUns64 TMgTemplateChecksum = %" PRIu64 ";" UUmNL, totalChecksum);
 	BFrFile_Printf(cFile, "UUtUns32 TMgNumTemplateDefinitions = %d;" UUmNL, TMgNumTemplateDefinitions);
 	BFrFile_Printf(cFile, "TMtTemplateDefinition* TMgTemplateDefinitionArray = NULL;" UUmNL);
 
@@ -497,7 +497,7 @@ TErExtract(
 				BFrFile_Printf(cFile, "\t// #%d"UUmNL, count);
 				BFrFile_Printf(cFile, "\t{"UUmNL);
 				
-				BFrFile_Printf(cFile, "\t\t" UUmFS_UUtUns64 "," UUmNL, curTemplate->checksum);
+				BFrFile_Printf(cFile, "\t\t%" PRIu64 "," UUmNL, curTemplate->checksum);
 				BFrFile_Printf(cFile, "\t\t0x%x," UUmNL, curTemplate->tag);
 				BFrFile_Printf(cFile, "\t\t\"%s\","UUmNL, curTemplate->name);
 				BFrFile_Printf(cFile, "\t\tNULL," UUmNL);
@@ -541,7 +541,7 @@ TErExtract(
 					(curTemplate->tag >> 16) & 0xFF,
 					(curTemplate->tag >> 8) & 0xFF,
 					(curTemplate->tag >> 0) & 0xFF);
-								
+
 				curTemplate++;
 				count++;
 			}
