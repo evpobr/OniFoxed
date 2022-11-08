@@ -12,6 +12,10 @@
 
 #include "BFW.h"
 
+#ifdef HAVE_INTRIN_H
+#include <intrin.h>
+#endif
+
 #ifdef __MOTO__
 	// Motorola's PowerPC compiler has a unique name for this intrinsic
 	#define i_cntlzw(value) (__builtin_cntlzw(value))
@@ -80,13 +84,83 @@ UUtUns32 *UUrBitVector_New(UUtUns32 size);
 void UUrBitVector_Dispose(UUtUns32 *vector);
 
 #if UUmCompiler	== UUmCompiler_VisC
-UUtBool __fastcall UUrBitVector_TestBit(const UUtUns32 *vector, UUtUns32 bit);
-UUtBool __fastcall UUrBitVector_TestAndSetBit(UUtUns32 *vector, UUtUns32 bit);
-UUtBool __fastcall UUrBitVector_TestAndClearBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_SetBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_ClearBit(UUtUns32 *vector, UUtUns32 bit);
-void __fastcall UUrBitVector_ToggleBit(UUtUns32 *vector, UUtUns32 bit);
-UUtUns32 __fastcall UUrBitVector_FindFirstSet(UUtInt32 value);
+static inline UUtBool __fastcall UUrBitVector_TestBit(const UUtUns32 *vector, UUtUns32 bit)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	return _bittest(vector, bit);
+#else
+	__asm
+	{
+		bt [ecx], edx
+		setc al
+	}
+#endif
+}
+
+static inline UUtBool __fastcall UUrBitVector_TestAndSetBit(UUtUns32 *vector, UUtUns32 bit)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	return _bittestandset(vector, bit);
+#else
+	__asm
+	{
+		bts [ecx], edx
+		setc al
+	}
+#endif
+}
+
+static inline UUtBool __fastcall UUrBitVector_TestAndClearBit(UUtUns32 *vector, UUtUns32 bit)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	return _bittestandreset(vector, bit);
+#else
+	__asm
+	{
+		btr [ecx], edx
+		setc al
+	}
+#endif
+}
+
+static inline void __fastcall UUrBitVector_SetBit(UUtUns32 *vector, UUtUns32 bit)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	_bittestandset(vector, bit);
+#else
+	__asm
+	{
+		bts [ecx], edx
+	}
+#endif
+}
+
+static inline void __fastcall UUrBitVector_ClearBit(UUtUns32 *vector, UUtUns32 bit)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	_bittestandreset(vector, bit);
+#else
+	__asm
+	{
+		btr [ecx], edx
+	}
+#endif
+}
+
+static inline UUtUns32 __fastcall UUrBitVector_FindFirstSet(UUtInt32 value)
+{
+#ifdef HAVE_WIN32_BIT_INTRINSICS
+	unsigned long mask;
+	return _BitScanForward(&mask, value) ? mask : 32;
+#else
+	__asm
+	{
+		mov eax, 32			// if ecx = 0, eax is unset so move 32 to eax
+		bsf eax, ecx		
+	}
+#endif
+}
+
 #else
 UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 r3);
 

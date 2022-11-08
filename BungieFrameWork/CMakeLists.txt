@@ -1,5 +1,27 @@
 project(BFW)
 
+if(WIN32)
+    check_include_file(intrin.h HAVE_INTRIN_H)
+    if(HAVE_INTRIN_H)
+        check_c_source_compiles("
+            #include <intrin.h>
+            int main()
+            {
+                long a = 0;
+                long b = 0;
+                unsigned char tmp = _bittest(&a, b);
+                tmp = _bittestandset(&a, b);
+                tmp = _bittestandreset(&a, b);
+                unsigned long c = 0;
+                unsigned long d = 0;
+                tmp = _BitScanForward(&c, d);
+                return 0;
+            }
+        "
+        HAVE_WIN32_BIT_INTRINSICS)
+    endif()
+endif()
+
 add_library(BFW STATIC
     BFW_Headers/BFW.h
     BFW_Headers/BFW_Akira.h
@@ -349,6 +371,11 @@ target_include_directories(BFW
         ${Oni_SOURCE_DIR}/OniProj/OniGameSource
         ${Oni_SOURCE_DIR}/OniProj/OniGameSource/Oni_AI
         ${Oni_SOURCE_DIR}/OniProj/OniGameSource/Oni_Object)
+
+target_compile_definitions(BFW
+    PUBLIC
+        $<$<BOOL:${HAVE_INTRIN_H}>:HAVE_INTRIN_H>
+        $<$<BOOL:${HAVE_WIN32_BIT_INTRINSICS}>:HAVE_WIN32_BIT_INTRINSICS>)
 
 if(WIN32)
     target_sources(BFW

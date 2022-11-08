@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16.0)
 project(Oni LANGUAGES C)
 
 include(CheckCSourceCompiles)
+include(CheckIncludeFile)
 include(CMakeDependentOption)
 cmake_dependent_option(ONI_BINK_VIDEO "Build with Bink Video support" OFF "WIN32;CMAKE_SIZEOF_VOID_P EQUAL 4" OFF)
 cmake_dependent_option(ONI_MAP_FILE "Generate MAP file" OFF "MSVC;WIN32;CMAKE_SIZEOF_VOID_P EQUAL 4" OFF)

@@ -111,59 +111,6 @@ void UUrBitVector_Dispose(UUtUns32 *bitVector)
 	UUrMemory_Block_Delete(bitVector);
 }
 
-#if UUmCompiler	== UUmCompiler_VisC
-UUtBool __fastcall UUrBitVector_TestBit(const UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		bt [ecx], edx
-		setc al
-	}
-}
-
-UUtBool __fastcall UUrBitVector_TestAndSetBit(UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		bts [ecx], edx
-		setc al
-	}
-}
-
-UUtBool __fastcall UUrBitVector_TestAndClearBit(UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		btr [ecx], edx
-		setc al
-	}
-}
-
-void __fastcall UUrBitVector_SetBit(UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		bts [ecx], edx
-	}
-}
-
-void __fastcall UUrBitVector_ClearBit(UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		btr [ecx], edx
-	}
-}
-
-void __fastcall UUrBitVector_ToggleBit(UUtUns32 *bitVector, UUtUns32 bit)
-{
-	__asm
-	{
-		btc [ecx], edx
-	}
-}
-#endif
-
 UUtBool UUrBitVector_TestBitRange(const UUtUns32 *bitVector, UUtUns32 start, UUtUns32 end)
 {
 	UUtUns32	start_mask= BV_START_MASK(start);
@@ -279,22 +226,7 @@ void UUrBitVector_ToggleBitRange(UUtUns32 *bitVector, UUtUns32 start, UUtUns32 e
 	bitVector[start_index] ^= start_mask;
 }
 
-#if UUmCompiler	== UUmCompiler_VisC
-
-#pragma auto_inline( off )
-
-UUtUns32 __fastcall UUrBitVector_FindFirstSet(UUtInt32 r3)
-{
-	__asm
-	{
-		mov eax, 32			// if ecx = 0, eax is unset so move 32 to eax
-		bsf eax, ecx		
-	}
-}
-
-#pragma auto_inline( on )
-
-#elif defined(i_cntlzw)
+#if !defined(HAVE_WIN32_BIT_INTRINSICS) && defined(i_cntlzw)
 
 // POWERPC count trailing zeroes
 // # R3 contains x  
@@ -315,7 +247,7 @@ UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 r3)
 	return r4;
 }
 
-#else
+#elif !defined(HAVE_WIN32_BIT_INTRINSICS)
 
 UUtUns32 UUrBitVector_FindFirstSet(UUtInt32 value)
 {
