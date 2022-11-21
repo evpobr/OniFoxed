@@ -2822,7 +2822,7 @@ void MUrPoint3D_Lerp(const M3tPoint3D *inFrom, const M3tPoint3D *inTo, float t, 
 	return;
 }
 
-#if UUmCompiler	== UUmCompiler_VisC
+#if UUmCompiler	== UUmCompiler_VisC && UUmProcessor == UUmProcessor_x86
 UUtInt32 MUrFloat_Round_To_Int(float inFloatNumber)
 {
 	UUtInt32 i;

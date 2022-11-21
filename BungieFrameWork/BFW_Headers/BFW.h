@@ -76,8 +76,9 @@ extern "C" {
 	#define UUmPlatform_Win32		1
 	#define UUmPlatform_Mac			2
 
-	#define UUmProcessor_Pentium	1
-	#define UUmProcessor_PPC		2
+	#define UUmProcessor_x86		1
+	#define UUmProcessor_x86_64		2
+	#define UUmProcessor_PPC		3
 
 	#define UUmCompiler_VisC		1
 	#define UUmCompiler_MWerks		2
@@ -107,7 +108,7 @@ extern "C" {
 	#endif
 
 	#if !defined(UUmProcessor)
-		#if (defined(__MWERKS__) && defined(__POWERPC__)) || defined(__MRC__) || defined(__MOTO__) || defined(ppc) || defined(__ppc__) || defined(__ppc)
+		#if (defined(__powerpc) && defined(_M_PPC)) || defined(__PPCGECKO__) || defined(__PPCBROADWAY__) || defined(_XENON) || defined(__ppc)
 			#define UUmProcessor	UUmProcessor_PPC
 
 			#if defined(__ALTIVEC__) && defined(__VEC__)
@@ -116,12 +117,12 @@ extern "C" {
 				#define UUmSIMD		UUmSIMD_None
 			#endif
 
-		#elif defined(i386)
-			#define UUmProcessor	UUmProcessor_Pentium
+		#elif defined(i386) || defined(__i386) || defined(_M_IX86) || defined(__X86__) || defined(_X86_) || defined(__I86__)
+			#define UUmProcessor	UUmProcessor_x86
 			#define UUmSIMD			UUmSIMD_None
 
-		#elif (defined(__MWERKS__) && defined(__INTEL__)) || defined(_MSC_VER) || defined(__WATCOMC__)
-			#define UUmProcessor	UUmProcessor_Pentium
+		#elif (defined(__amd64__) && defined(__amd64)) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+			#define UUmProcessor	UUmProcessor_x86_64
 			#define UUmSIMD			UUmSIMD_None
 		#else
 			#error Unknown processor - please specify and then do a search on UUmProcessor to add the needed cases
@@ -149,7 +150,7 @@ extern "C" {
 	#if !defined(UUmEndian)
 		#if UUmProcessor == UUmProcessor_PPC
 			#define UUmEndian	UUmEndian_Big
-		#elif UUmProcessor == UUmProcessor_Pentium
+		#elif UUmProcessor == UUmProcessor_x86 || UUmProcessor == UUmProcessor_x86_64
 			#define UUmEndian	UUmEndian_Little
 		#else
 			#error Could not automatically determine endianness, please specify manually
@@ -164,7 +165,7 @@ extern "C" {
  *		necessarily need to be exactly correct. A correct value would lead to higher performance.
  *	2. UUrProcessor_ZeroCacheLine - An instruction to zero a cache line. This is a hint to help memory bandwidth
  */
-	#if UUmProcessor == UUmProcessor_Pentium
+	#if UUmProcessor == UUmProcessor_x86 || UUmProcessor == UUmProcessor_x86_64
 		#define UUcProcessor_CacheLineBits	(5)
 		#define UUrProcessor_ZeroCacheLine(x, y)
 	#elif UUmProcessor == UUmProcessor_PPC

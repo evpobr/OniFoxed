@@ -3491,7 +3491,7 @@ void AUrDict_Dispose(AUtDict *inDict)
 
 #if UUmCompiler	== UUmCompiler_VisC
 
-#if 1
+#if UUmProcessor == UUmProcessor_x86
 __declspec( naked ) UUtBool __fastcall AUrDict_TestAndAdd(AUtDict *inDict, UUtUns32 key)
 {
 	__asm

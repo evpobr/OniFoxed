@@ -731,7 +731,7 @@ UUrPlatform_MameAndDestroy(
 }
 
 
-#if UUmCompiler	== UUmCompiler_VisC
+#if UUmCompiler	== UUmCompiler_VisC && UUmProcessor == UUmProcessor_x86
 long __cdecl _ftol(float number)
 {
 	__asm 
